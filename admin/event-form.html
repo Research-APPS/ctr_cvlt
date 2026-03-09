@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crear evento — ESCENA</title>
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <style>
+    .form-page {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .form-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      margin-bottom: var(--space-lg);
+    }
+
+    .form-card__header {
+      padding: var(--space-lg) var(--space-xl);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    .form-card__icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      background: var(--accent-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+
+    .form-card__title {
+      font-size: var(--text-base);
+      font-weight: 700;
+    }
+
+    .form-card__body {
+      padding: var(--space-xl);
+    }
+
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: var(--space-md);
+    }
+
+    @media (max-width: 700px) { .form-grid-3 { grid-template-columns: 1fr; } }
+    @media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } }
+
+    /* Ticket type rows */
+    .ticket-type-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 40px;
+      gap: var(--space-sm);
+      align-items: end;
+      margin-bottom: var(--space-sm);
+    }
+
+    @media (max-width: 600px) {
+      .ticket-type-row { grid-template-columns: 1fr 1fr; }
+      .ticket-type-row > *:nth-child(4) { grid-column: 1/-1; }
+    }
+
+    .remove-row-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--danger);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition);
+      flex-shrink: 0;
+      align-self: end;
+    }
+
+    .remove-row-btn:hover { background: rgba(255,68,68,0.08); border-color: var(--danger); }
+
+    /* Preview */
+    .preview-toggle {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      cursor: pointer;
+      margin-bottom: var(--space-xl);
+      width: fit-content;
+    }
+
+    .preview-toggle:hover { color: var(--text-primary); }
+
+    .preview-frame {
+      display: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      margin-bottom: var(--space-xl);
+    }
+
+    .preview-frame.show { display: block; }
+
+    .preview-header {
+      position: relative;
+      height: 200px;
+      background: var(--bg-surface);
+      overflow: hidden;
+    }
+
+    .preview-header img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.5;
+    }
+
+    .preview-header__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10,10,10,1) 0%, transparent 60%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: var(--space-lg);
+    }
+
+    .preview-title { font-size: var(--text-xl); font-weight: 700; }
+    .preview-meta  { font-size: var(--text-sm); color: var(--text-secondary); margin-top: var(--space-xs); }
+
+    /* Sticky footer */
+    .form-footer {
+      position: sticky;
+      bottom: 0;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: var(--space-md) var(--space-lg);
+      display: flex;
+      gap: var(--space-md);
+      align-items: center;
+      justify-content: flex-end;
+      z-index: 50;
+      flex-wrap: wrap;
+    }
+
+    /* Success overlay */
+    .save-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .save-overlay.show { display: flex; }
+
+    .save-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .save-card__icon {
+      font-size: 3rem;
+      margin-bottom: var(--space-md);
+    }
+
+    .save-card__title { font-size: var(--text-2xl); margin-bottom: var(--space-sm); }
+    .save-card__sub   { color: var(--text-secondary); margin-bottom: var(--space-xl); }
+    .save-card__actions { display: flex; gap: var(--space-sm); justify-content: center; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <header class="navbar"></header>
+
+  <main class="page-content">
+    <div class="container">
+      <div class="form-page">
+
+        <nav class="breadcrumb" style="margin-bottom:var(--space-lg)">
+          <a href="index.html">Panel</a>
+          <span class="breadcrumb__sep">/</span>
+          <span class="breadcrumb__current" id="pageTitle">Crear evento</span>
+        </nav>
+
+        <div class="admin-header" style="margin-bottom:var(--space-xl)">
+          <h1 id="formTitle">Crear nuevo evento</h1>
+        </div>
+
+        <!-- Preview toggle -->
+        <div class="preview-toggle" onclick="togglePreview()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span id="previewToggleText">Vista previa</span>
+        </div>
+
+        <!-- Live preview -->
+        <div class="preview-frame" id="previewFrame">
+          <div class="preview-header">
+            <img id="previewBg" src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=200&fit=crop" alt="">
+            <div class="preview-header__overlay">
+              <div class="preview-title" id="previewTitle">Nombre del evento</div>
+              <div class="preview-meta" id="previewMeta">Fecha · Sala</div>
+            </div>
+          </div>
+          <div style="padding:var(--space-lg);background:var(--bg-card)">
+            <p class="text-secondary text-sm" id="previewDesc" style="line-height:1.7">Descripción del evento...</p>
+          </div>
+        </div>
+
+        <!-- Form -->
+        <form id="eventForm">
+
+          <!-- Basic info -->
+          <div class="form-card">
+            <div class="form-card__header">
+              <div class="form-card__icon">📝</div>
+              <div class="form-card__title">Información básica</div>
+            </div>
+            <div class="form-card__body">
+              <div class="form-group">
+                <label class="form-label">Nombre del evento *</label>
+                <input class="form-input" id="evTitle" type="text" placeholder="Ej: Radio Micelio · Madrid" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Subtítulo / descripción corta</label>
+                <input class="form-input" id="evSubtitle" type="text" placeholder="Ej: Presentación de 'Hyphal Networks'">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Descripción completa</label>
+                <textarea class="form-textarea" id="evDesc" placeholder="Escribe aquí la descripción editorial del evento..."></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Géneros (separados por coma)</label>
+                <input class="form-input" id="evGenres" type="text" placeholder="Ej: Experimental, Ambient, Post-rock">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Política de acceso</label>
+                <select class="form-select" id="evAge">
+                  <option value="Todos los públicos">Todos los públicos</option>
+                  <option value="+16">+16</option>
+                  <option value="+18" selected>+18</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Date & venue -->
+          <div class="form-card">
+            <div class="form-card__header">
+              <div class="form-card__icon">📍</div>
+              <div class="form-card__title">Fecha y lugar</div>
+            </div>
+            <div class="form-card__body">
+              <div class="form-grid-3">
+                <div class="form-group">
+                  <label class="form-label">Fecha *</label>
+                  <input class="form-input" id="evDate" type="date" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Hora de apertura</label>
+                  <input class="form-input" id="evTimeDoors" type="time" value="20:00">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Hora de inicio</label>
+                  <input class="form-input" id="evTimeStart" type="time" value="21:00">
+                </div>
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Sala</label>
+                  <select class="form-select" id="evVenue">
+                    <option value="">— Seleccionar sala —</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Ciudad</label>
+                  <input class="form-input" id="evCity" type="text" placeholder="Madrid" readonly style="background:var(--bg-surface)">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Media -->
+          <div class="form-card">
+            <div class="form-card__header">
+              <div class="form-card__icon">🖼</div>
+              <div class="form-card__title">Imágenes y vídeo</div>
+            </div>
+            <div class="form-card__body">
+              <div class="form-group">
+                <label class="form-label">URL de imagen principal</label>
+                <input class="form-input" id="evImage" type="url" placeholder="https://... (URL de imagen)">
+                <span class="form-hint">Recomendado: 1200 × 600px</span>
+              </div>
+              <div class="form-group">
+                <label class="form-label">URL de vídeo YouTube (embed)</label>
+                <input class="form-input" id="evYoutube" type="url" placeholder="https://www.youtube.com/embed/...">
+              </div>
+            </div>
+          </div>
+
+          <!-- Ticket types -->
+          <div class="form-card">
+            <div class="form-card__header">
+              <div class="form-card__icon">🎟</div>
+              <div class="form-card__title">Tipos de entrada</div>
+            </div>
+            <div class="form-card__body">
+              <div id="ticketTypesContainer">
+                <!-- rows added by JS -->
+              </div>
+              <button type="button" class="btn btn--secondary btn--sm" onclick="addTicketType()">
+                + Añadir tipo de entrada
+              </button>
+            </div>
+          </div>
+
+          <!-- FAQ -->
+          <div class="form-card">
+            <div class="form-card__header">
+              <div class="form-card__icon">❓</div>
+              <div class="form-card__title">FAQ (preguntas frecuentes)</div>
+            </div>
+            <div class="form-card__body">
+              <div id="faqContainer"></div>
+              <button type="button" class="btn btn--secondary btn--sm" onclick="addFAQ()">
+                + Añadir pregunta
+              </button>
+            </div>
+          </div>
+
+          <!-- State -->
+          <div class="form-card">
+            <div class="form-card__header">
+              <div class="form-card__icon">⚙️</div>
+              <div class="form-card__title">Publicación</div>
+            </div>
+            <div class="form-card__body">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Estado</label>
+                  <select class="form-select" id="evStatus">
+                    <option value="draft">Borrador</option>
+                    <option value="published" selected>Publicado</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Destacar en home</label>
+                  <select class="form-select" id="evFeatured">
+                    <option value="false">No</option>
+                    <option value="true">Sí</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </form>
+
+        <div style="padding-bottom:80px"></div>
+
+      </div><!-- /form-page -->
+    </div>
+  </main>
+
+  <!-- Sticky save bar -->
+  <div class="form-footer">
+    <span class="text-secondary text-sm" id="saveStatus"></span>
+    <button type="button" class="btn btn--secondary" onclick="saveDraft()">Guardar borrador</button>
+    <button type="button" class="btn btn--primary" onclick="saveAndPublish()">Guardar y publicar</button>
+  </div>
+
+  <!-- Success overlay -->
+  <div class="save-overlay" id="saveOverlay">
+    <div class="save-card">
+      <div class="save-card__icon">✅</div>
+      <div class="save-card__title" id="overlayTitle">Evento guardado</div>
+      <p class="save-card__sub" id="overlayMsg">El evento ha sido creado correctamente.</p>
+      <div class="save-card__actions">
+        <a class="btn btn--secondary" id="overlayViewBtn" href="#">Ver evento</a>
+        <a class="btn btn--primary" href="index.html">Volver al panel</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer"></footer>
+
+  <script src="../js/store.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/data.js"></script>
+  <script src="../js/ui.js"></script>
+  <script>
+    let ticketCount = 0;
+    let faqCount    = 0;
+    let editingId   = null;
+
+    (async () => {
+      UI.renderNavbar({ base: '..', activePage: 'admin' });
+      UI.renderFooter({ base: '..' });
+
+      if (!Auth.requireAdmin()) return;
+
+      await Data.loadAll();
+
+      // Populate venue select
+      const venueSelect = document.getElementById('evVenue');
+      Data.getVenues().forEach(v => {
+        venueSelect.innerHTML += `<option value="${v.id}" data-city="${v.city}">${v.name} · ${v.city}</option>`;
+      });
+
+      venueSelect.addEventListener('change', e => {
+        const opt = e.target.selectedOptions[0];
+        document.getElementById('evCity').value = opt.dataset.city || '';
+      });
+
+      // Add default ticket types
+      addTicketType('Anticipada', 12, 100);
+      addTicketType('General', 15, 50);
+
+      // Set default date to next week
+      const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      document.getElementById('evDate').value = nextWeek.toISOString().split('T')[0];
+
+      // Check if editing
+      const editId = new URLSearchParams(window.location.search).get('edit');
+      if (editId) {
+        const event = Store.adminEvents.get().find(e => e.id === editId);
+        if (event) {
+          editingId = editId;
+          loadEventForEdit(event);
+        }
+      }
+
+      // Live preview listeners
+      ['evTitle', 'evSubtitle', 'evDate', 'evDesc', 'evImage'].forEach(id => {
+        document.getElementById(id).addEventListener('input', updatePreview);
+      });
+      venueSelect.addEventListener('change', updatePreview);
+    })();
+
+    function addTicketType(name = '', price = '', capacity = '') {
+      ticketCount++;
+      const id = ticketCount;
+      const container = document.getElementById('ticketTypesContainer');
+      const row = document.createElement('div');
+      row.className = 'ticket-type-row';
+      row.id = `tt-row-${id}`;
+      row.innerHTML = `
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Nombre</label>
+          <input class="form-input" type="text" placeholder="Anticipada" value="${name}" data-tt="name" data-id="${id}">
+        </div>
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Precio (€)</label>
+          <input class="form-input" type="number" placeholder="12" value="${price}" min="0" step="0.5" data-tt="price" data-id="${id}">
+        </div>
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Aforo</label>
+          <input class="form-input" type="number" placeholder="100" value="${capacity}" min="1" data-tt="capacity" data-id="${id}">
+        </div>
+        <button type="button" class="remove-row-btn" onclick="removeRow('tt-row-${id}')" title="Eliminar">×</button>`;
+      container.appendChild(row);
+    }
+
+    function addFAQ(q = '', a = '') {
+      faqCount++;
+      const id = faqCount;
+      const container = document.getElementById('faqContainer');
+      const row = document.createElement('div');
+      row.id = `faq-row-${id}`;
+      row.style.cssText = 'background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-md);margin-bottom:var(--space-sm)';
+      row.innerHTML = `
+        <div class="form-group">
+          <label class="form-label">Pregunta</label>
+          <input class="form-input" type="text" placeholder="¿Hay guardarropa?" value="${q}" data-faq="q" data-id="${id}">
+        </div>
+        <div class="form-group" style="margin-bottom:var(--space-sm)">
+          <label class="form-label">Respuesta</label>
+          <input class="form-input" type="text" placeholder="Sí, disponible por 2€" value="${a}" data-faq="a" data-id="${id}">
+        </div>
+        <button type="button" class="btn btn--danger btn--sm" onclick="removeRow('faq-row-${id}')">Eliminar</button>`;
+      container.appendChild(row);
+    }
+
+    function removeRow(id) {
+      document.getElementById(id)?.remove();
+    }
+
+    function getFormData() {
+      const title    = document.getElementById('evTitle').value.trim();
+      const subtitle = document.getElementById('evSubtitle').value.trim();
+      const desc     = document.getElementById('evDesc').value.trim();
+      const genres   = document.getElementById('evGenres').value.split(',').map(s => s.trim()).filter(Boolean);
+      const date     = document.getElementById('evDate').value;
+      const doors    = document.getElementById('evTimeDoors').value;
+      const start    = document.getElementById('evTimeStart').value;
+      const venueId  = document.getElementById('evVenue').value;
+      const image    = document.getElementById('evImage').value.trim();
+      const youtube  = document.getElementById('evYoutube').value.trim();
+      const status   = document.getElementById('evStatus').value;
+      const featured = document.getElementById('evFeatured').value === 'true';
+      const age      = document.getElementById('evAge').value;
+
+      // Ticket types
+      const ttRows = document.querySelectorAll('[data-tt="name"]');
+      const ticketTypes = Array.from(ttRows).map(el => {
+        const id = el.dataset.id;
+        const name = el.value.trim();
+        const price = parseFloat(document.querySelector(`[data-tt="price"][data-id="${id}"]`)?.value || 0);
+        const cap   = parseInt(document.querySelector(`[data-tt="capacity"][data-id="${id}"]`)?.value || 0);
+        return { id: `tt-${Date.now()}-${id}`, name, price, capacity: cap, available: cap };
+      }).filter(t => t.name && t.price > 0);
+
+      // FAQ
+      const faqQs = document.querySelectorAll('[data-faq="q"]');
+      const faq   = Array.from(faqQs).map(el => {
+        const faqId = el.dataset.id;
+        const q = el.value.trim();
+        const a = document.querySelector(`[data-faq="a"][data-id="${faqId}"]`)?.value.trim() || '';
+        return q && a ? { q, a } : null;
+      }).filter(Boolean);
+
+      return {
+        id:            editingId || `ev-${Date.now()}`,
+        title,
+        subtitle,
+        description_long: desc,
+        description_short: desc.slice(0, 160),
+        genres,
+        date:          date ? `${date}T${start || '21:00'}:00` : '',
+        time_doors:    doors,
+        time_start:    start,
+        venue_id:      venueId,
+        artist_ids:    [],
+        supporting_artist_ids: [],
+        cover_image:   image || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1200&h=600&fit=crop&auto=format',
+        gallery:       [],
+        youtube_url:   youtube,
+        ticket_types:  ticketTypes,
+        faq,
+        age_policy:    age,
+        status,
+        featured,
+      };
+    }
+
+    function saveDraft() {
+      const data = getFormData();
+      if (!data.title) { UI.toast('El nombre del evento es obligatorio', 'error'); return; }
+      data.status = 'draft';
+      Store.adminEvents.add(data);
+      document.getElementById('saveStatus').textContent = '✓ Borrador guardado';
+      setTimeout(() => document.getElementById('saveStatus').textContent = '', 3000);
+      UI.toast('Borrador guardado', 'success');
+    }
+
+    function saveAndPublish() {
+      const data = getFormData();
+      if (!data.title) { UI.toast('El nombre del evento es obligatorio', 'error'); return; }
+      if (!data.date)  { UI.toast('La fecha es obligatoria', 'error'); return; }
+      data.status = 'published';
+      Store.adminEvents.add(data);
+
+      const overlay = document.getElementById('saveOverlay');
+      document.getElementById('overlayTitle').textContent = editingId ? 'Evento actualizado' : 'Evento publicado';
+      document.getElementById('overlayMsg').textContent   = editingId
+        ? 'Los cambios se han guardado y el evento está publicado.'
+        : 'El evento ha sido creado y ya es visible en la web.';
+      document.getElementById('overlayViewBtn').href = `../event.html?id=${data.id}`;
+      overlay.classList.add('show');
+    }
+
+    function loadEventForEdit(event) {
+      document.getElementById('formTitle').textContent = 'Editar evento';
+      document.getElementById('pageTitle').textContent = 'Editar evento';
+      document.getElementById('evTitle').value    = event.title || '';
+      document.getElementById('evSubtitle').value = event.subtitle || '';
+      document.getElementById('evDesc').value     = event.description_long || '';
+      document.getElementById('evGenres').value   = (event.genres || []).join(', ');
+      document.getElementById('evImage').value    = event.cover_image || '';
+      document.getElementById('evYoutube').value  = event.youtube_url || '';
+      document.getElementById('evStatus').value   = event.status || 'draft';
+      document.getElementById('evFeatured').value = String(event.featured || false);
+      document.getElementById('evAge').value      = event.age_policy || '+18';
+      if (event.date) {
+        document.getElementById('evDate').value       = event.date.split('T')[0];
+        document.getElementById('evTimeDoors').value  = event.time_doors || '';
+        document.getElementById('evTimeStart').value  = event.time_start || '';
+      }
+      if (event.venue_id) {
+        document.getElementById('evVenue').value = event.venue_id;
+        const opt = document.querySelector(`#evVenue option[value="${event.venue_id}"]`);
+        document.getElementById('evCity').value = opt?.dataset.city || '';
+      }
+      // Ticket types
+      document.getElementById('ticketTypesContainer').innerHTML = '';
+      ticketCount = 0;
+      (event.ticket_types || []).forEach(tt => addTicketType(tt.name, tt.price, tt.capacity));
+      // FAQ
+      document.getElementById('faqContainer').innerHTML = '';
+      faqCount = 0;
+      (event.faq || []).forEach(f => addFAQ(f.q, f.a));
+
+      updatePreview();
+    }
+
+    function updatePreview() {
+      const title   = document.getElementById('evTitle').value || 'Nombre del evento';
+      const date    = document.getElementById('evDate').value;
+      const venueOp = document.getElementById('evVenue').selectedOptions[0];
+      const image   = document.getElementById('evImage').value;
+      const desc    = document.getElementById('evDesc').value;
+
+      document.getElementById('previewTitle').textContent = title;
+      document.getElementById('previewMeta').textContent  =
+        (date ? new Date(date).toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'}) : 'Fecha') +
+        (venueOp?.text ? ' · ' + venueOp.text : '');
+      document.getElementById('previewDesc').textContent  = desc || 'Descripción del evento...';
+      if (image) document.getElementById('previewBg').src = image;
+    }
+
+    function togglePreview() {
+      const frame = document.getElementById('previewFrame');
+      const show  = frame.classList.toggle('show');
+      document.getElementById('previewToggleText').textContent = show ? 'Ocultar vista previa' : 'Vista previa';
+    }
+  </script>
+</body>
+</html>

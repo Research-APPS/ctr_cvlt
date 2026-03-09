@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tu entrada — ESCENA</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    .ticket-page {
+      max-width: 620px;
+      margin: 0 auto;
+      padding: var(--space-2xl) var(--space-md);
+    }
+
+    .success-header {
+      text-align: center;
+      margin-bottom: var(--space-2xl);
+    }
+
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(0,214,123,0.12);
+      border: 2px solid var(--success);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--space-lg);
+      font-size: 2rem;
+    }
+
+    .success-title {
+      font-size: var(--text-3xl);
+      margin-bottom: var(--space-sm);
+    }
+
+    .success-sub {
+      color: var(--text-secondary);
+    }
+
+    /* Ticket card */
+    .ticket-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      margin-bottom: var(--space-xl);
+    }
+
+    .ticket-card__header {
+      background: linear-gradient(135deg, #141414, #1c1c1c);
+      padding: var(--space-xl) var(--space-lg);
+      position: relative;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ticket-card__header img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.15;
+    }
+
+    .ticket-card__header-content { position: relative; z-index: 1; }
+
+    .ticket-card__logo {
+      font-family: var(--font-display);
+      font-size: var(--text-sm);
+      color: var(--accent);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      margin-bottom: var(--space-sm);
+    }
+
+    .ticket-card__event-name {
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
+    }
+
+    .ticket-card__event-sub {
+      color: var(--text-secondary);
+      font-size: var(--text-sm);
+      margin-bottom: var(--space-md);
+    }
+
+    .ticket-card__meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-lg);
+    }
+
+    .ticket-card__meta-item { font-size: var(--text-sm); }
+    .ticket-card__meta-label { color: var(--text-muted); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.06em; }
+    .ticket-card__meta-value { font-weight: 600; color: var(--text-primary); margin-top: 2px; }
+
+    /* Dashed separator */
+    .ticket-perforation {
+      position: relative;
+      border-top: 2px dashed var(--border);
+      margin: 0;
+    }
+
+    .ticket-perforation::before,
+    .ticket-perforation::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--bg);
+    }
+
+    .ticket-perforation::before { left: -12px; }
+    .ticket-perforation::after  { right: -12px; }
+
+    .ticket-card__body {
+      padding: var(--space-xl) var(--space-lg);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: var(--space-xl);
+      align-items: center;
+    }
+
+    .ticket-card__locator-label {
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: var(--space-xs);
+    }
+
+    .ticket-card__locator {
+      font-family: 'Courier New', monospace;
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+    }
+
+    .ticket-card__type {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      margin-top: var(--space-sm);
+    }
+
+    .ticket-card__buyer {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      margin-top: var(--space-xs);
+    }
+
+    /* QR */
+    .qr-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    .qr-code {
+      width: 120px;
+      height: 120px;
+      border-radius: var(--radius-md);
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .qr-inner {
+      width: 100%;
+      height: 100%;
+      background:
+        /* QR grid pattern (fake but convincing) */
+        repeating-linear-gradient(0deg, #000 0, #000 3px, transparent 3px, transparent 6px),
+        repeating-linear-gradient(90deg, #000 0, #000 3px, transparent 3px, transparent 6px);
+      opacity: 0.9;
+      border-radius: 2px;
+    }
+
+    .qr-corners {
+      position: absolute;
+      inset: 8px;
+      pointer-events: none;
+    }
+
+    .qr-corner {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #000;
+    }
+
+    .qr-corner--tl { top: 0; left: 0; border-right: none; border-bottom: none; }
+    .qr-corner--tr { top: 0; right: 0; border-left: none; border-bottom: none; }
+    .qr-corner--bl { bottom: 0; left: 0; border-right: none; border-top: none; }
+
+    .qr-label {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      font-family: 'Courier New', monospace;
+    }
+
+    @media (max-width: 480px) {
+      .ticket-card__body { grid-template-columns: 1fr; }
+      .qr-block { flex-direction: row; }
+    }
+
+    /* Actions */
+    .ticket-actions {
+      display: flex;
+      gap: var(--space-sm);
+      flex-wrap: wrap;
+      margin-bottom: var(--space-xl);
+    }
+
+    /* Calendar section */
+    .next-steps {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      margin-bottom: var(--space-xl);
+    }
+
+    .next-step-item {
+      display: flex;
+      gap: var(--space-md);
+      padding: var(--space-sm) 0;
+    }
+
+    .next-step-item__icon {
+      font-size: 1.25rem;
+      width: 32px;
+      flex-shrink: 0;
+      text-align: center;
+    }
+
+    .next-step-item__text {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+    }
+
+    .next-step-item__text strong {
+      color: var(--text-primary);
+    }
+
+    @media print {
+      .navbar, .footer, .ticket-actions, .next-steps, .back-section { display: none !important; }
+      .ticket-card { border-color: #ccc; }
+      body { background: white; color: black; }
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar"></header>
+
+  <main class="page-content">
+    <div class="ticket-page">
+
+      <!-- Success header -->
+      <div class="success-header">
+        <div class="success-icon">✓</div>
+        <h1 class="success-title">¡Compra completada!</h1>
+        <p class="success-sub">Tu entrada ha sido confirmada. Guarda esta pantalla o descarga el PDF.</p>
+      </div>
+
+      <!-- The Ticket -->
+      <div class="ticket-card" id="ticketCard">
+        <div class="ticket-card__header">
+          <img id="ticketBg" src="" alt="">
+          <div class="ticket-card__header-content">
+            <div class="ticket-card__logo">ESCENA</div>
+            <div class="ticket-card__event-name" id="ticketEventName">—</div>
+            <div class="ticket-card__event-sub" id="ticketEventSub">—</div>
+            <div class="ticket-card__meta-row" id="ticketMeta"></div>
+          </div>
+        </div>
+
+        <div class="ticket-perforation"></div>
+
+        <div class="ticket-card__body">
+          <div>
+            <div class="ticket-card__locator-label">Localizador</div>
+            <div class="ticket-card__locator" id="ticketLocator">—</div>
+            <div class="ticket-card__type" id="ticketType">—</div>
+            <div class="ticket-card__buyer" id="ticketBuyer">—</div>
+          </div>
+          <div class="qr-block">
+            <div class="qr-code">
+              <div class="qr-inner"></div>
+              <div class="qr-corners">
+                <div class="qr-corner qr-corner--tl"></div>
+                <div class="qr-corner qr-corner--tr"></div>
+                <div class="qr-corner qr-corner--bl"></div>
+              </div>
+            </div>
+            <div class="qr-label" id="qrLabel">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="ticket-actions">
+        <button class="btn btn--primary" onclick="window.print()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Descargar / Imprimir
+        </button>
+        <button class="btn btn--secondary" id="calBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Añadir al calendario
+        </button>
+        <button class="btn btn--secondary" onclick="navigator.share ? navigator.share({title:document.title,url:location.href}) : UI.toast('Comparte con tus amigos','success')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Compartir
+        </button>
+      </div>
+
+      <!-- Next steps -->
+      <div class="next-steps">
+        <h3 style="margin-bottom:var(--space-lg);font-size:var(--text-lg)">Qué ocurre ahora</h3>
+        <div class="next-step-item">
+          <div class="next-step-item__icon">📧</div>
+          <div class="next-step-item__text">
+            <strong>Email de confirmación</strong><br>
+            En producción recibirías un email con tu entrada adjunta en PDF.
+          </div>
+        </div>
+        <div class="next-step-item">
+          <div class="next-step-item__icon">📱</div>
+          <div class="next-step-item__text">
+            <strong>En la puerta</strong><br>
+            Enseña el QR de tu entrada. El equipo lo escaneará desde su móvil.
+          </div>
+        </div>
+        <div class="next-step-item">
+          <div class="next-step-item__icon">🎶</div>
+          <div class="next-step-item__text">
+            <strong>Disfruta el concierto</strong><br>
+            Las puertas abren 1 hora antes. Consulta la info práctica del evento.
+          </div>
+        </div>
+      </div>
+
+      <!-- Back -->
+      <div class="back-section" style="text-align:center">
+        <a href="index.html" class="btn btn--ghost">← Ver más conciertos</a>
+        <a href="profile.html" class="btn btn--ghost">Mi perfil y entradas →</a>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="footer"></footer>
+
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    (async () => {
+      UI.renderNavbar({ base: '.' });
+      UI.renderFooter({ base: '.' });
+
+      if (!Auth.requireLogin()) return;
+
+      await Data.loadAll();
+
+      const orderId = Data.getURLParam('order');
+      if (!orderId) { window.location.href = 'index.html'; return; }
+
+      const purchases = Store.purchases.get();
+      const order = purchases.find(p => p.id === orderId);
+      if (!order) { window.location.href = 'index.html'; return; }
+
+      // Populate ticket
+      const event = order.event_id ? Data.getEvent(order.event_id) : null;
+      const venue = event ? Data.getVenue(event.venue_id) : null;
+
+      if (event) {
+        document.getElementById('ticketBg').src = event.cover_image;
+        document.getElementById('ticketEventName').textContent = event.title;
+        document.getElementById('ticketEventSub').textContent  = event.subtitle || '';
+        document.title = `Entrada: ${event.title} — ESCENA`;
+
+        const dt = Data.formatDateShort(event.date);
+        document.getElementById('ticketMeta').innerHTML = `
+          <div class="ticket-card__meta-item">
+            <div class="ticket-card__meta-label">Fecha</div>
+            <div class="ticket-card__meta-value">${dt.day} ${dt.month} ${dt.year}</div>
+          </div>
+          <div class="ticket-card__meta-item">
+            <div class="ticket-card__meta-label">Hora</div>
+            <div class="ticket-card__meta-value">${event.time_start}</div>
+          </div>
+          ${venue ? `<div class="ticket-card__meta-item">
+            <div class="ticket-card__meta-label">Sala</div>
+            <div class="ticket-card__meta-value">${venue.name}</div>
+          </div>` : ''}`;
+
+        // Calendar button
+        if (venue) {
+          const gcalUrl = Data.getGoogleCalendarUrl(event, venue);
+          document.getElementById('calBtn').onclick = () => window.open(gcalUrl, '_blank');
+        }
+      }
+
+      // Localizador
+      document.getElementById('ticketLocator').textContent = orderId;
+      document.getElementById('qrLabel').textContent = orderId.slice(0,14) + '...';
+
+      // Tipo y comprador
+      const typeNames = (order.items || []).map(i => `${i.ticket_type_name} × ${i.quantity}`).join(', ');
+      document.getElementById('ticketType').textContent  = typeNames || 'Entrada general';
+      document.getElementById('ticketBuyer').textContent = `${order.buyer_name} · ${order.buyer_email}`;
+    })();
+  </script>
+</body>
+</html>

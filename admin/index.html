@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Admin — ESCENA</title>
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <style>
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: var(--space-2xl);
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .admin-layout { grid-template-columns: 1fr; }
+      .admin-sidebar { display: none; }
+    }
+
+    /* Sidebar */
+    .admin-sidebar {
+      position: sticky;
+      top: calc(var(--navbar-height) + var(--space-lg));
+    }
+
+    .admin-sidebar__section {
+      margin-bottom: var(--space-lg);
+    }
+
+    .admin-sidebar__label {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      padding: 0 var(--space-sm);
+      margin-bottom: var(--space-sm);
+    }
+
+    .admin-nav-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: all var(--transition);
+      cursor: pointer;
+      text-decoration: none;
+      width: 100%;
+      background: none;
+      border: none;
+      text-align: left;
+    }
+
+    .admin-nav-item:hover { background: var(--bg-surface); color: var(--text-primary); }
+    .admin-nav-item.active { background: var(--accent-dim); color: var(--accent); }
+
+    /* Stats grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-md);
+      margin-bottom: var(--space-2xl);
+    }
+
+    @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } }
+
+    /* Admin header */
+    .admin-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-xl);
+      flex-wrap: wrap;
+      gap: var(--space-md);
+    }
+
+    .admin-header h1 { font-size: var(--text-2xl); }
+
+    /* Table wrapper */
+    .table-wrapper {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+
+    .table-wrapper__header {
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+      flex-wrap: wrap;
+    }
+
+    .table-wrapper__title {
+      font-weight: 700;
+      font-size: var(--text-base);
+    }
+
+    .table-scroll { overflow-x: auto; }
+
+    .admin-table td:first-child { font-weight: 600; color: var(--text-primary); }
+
+    .event-thumb {
+      width: 48px;
+      height: 32px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+    }
+
+    /* Progress bar */
+    .progress-bar {
+      height: 6px;
+      background: var(--bg-surface);
+      border-radius: 3px;
+      overflow: hidden;
+      width: 100px;
+    }
+
+    .progress-bar__fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 3px;
+      transition: width var(--transition-slow);
+    }
+
+    .progress-label {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Quick action cards */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-md);
+      margin-bottom: var(--space-2xl);
+    }
+
+    @media (max-width: 600px) { .quick-actions { grid-template-columns: 1fr; } }
+
+    .quick-action-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      cursor: pointer;
+      transition: all var(--transition);
+      text-align: center;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .quick-action-card:hover {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    .quick-action-card__icon { font-size: 1.5rem; }
+    .quick-action-card__label { font-size: var(--text-sm); font-weight: 600; color: var(--text-primary); }
+    .quick-action-card__sub   { font-size: var(--text-xs); color: var(--text-muted); }
+
+    /* Confirm delete modal */
+    .delete-confirm { display: none; }
+    .delete-confirm.show { display: flex; }
+  </style>
+</head>
+<body>
+  <header class="navbar"></header>
+
+  <main class="page-content">
+    <div class="container">
+      <div class="admin-layout">
+
+        <!-- ─── Sidebar ─────────────────────────────────── -->
+        <aside class="admin-sidebar">
+          <div class="admin-sidebar__section">
+            <div class="admin-sidebar__label">Panel</div>
+            <a class="admin-nav-item active" href="index.html">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+              Dashboard
+            </a>
+            <a class="admin-nav-item" href="event-form.html">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Crear evento
+            </a>
+          </div>
+          <div class="admin-sidebar__section">
+            <div class="admin-sidebar__label">Cuenta</div>
+            <button class="admin-nav-item" onclick="window.location.href='../index.html'">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+              Ver web pública
+            </button>
+            <button class="admin-nav-item" onclick="Auth.logout()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              Cerrar sesión
+            </button>
+          </div>
+        </aside>
+
+        <!-- ─── Main content ──────────────────────────── -->
+        <div>
+          <div class="admin-header">
+            <div>
+              <h1>Dashboard</h1>
+              <p class="text-secondary" id="welcomeMsg" style="font-size:var(--text-sm)">Bienvenido al panel de gestión</p>
+            </div>
+            <a href="event-form.html" class="btn btn--primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Crear evento
+            </a>
+          </div>
+
+          <!-- Quick actions -->
+          <div class="quick-actions">
+            <a href="event-form.html" class="quick-action-card">
+              <div class="quick-action-card__icon">🎵</div>
+              <div class="quick-action-card__label">Nuevo evento</div>
+              <div class="quick-action-card__sub">Crear y publicar</div>
+            </a>
+            <a href="../index.html" class="quick-action-card">
+              <div class="quick-action-card__icon">👁</div>
+              <div class="quick-action-card__label">Ver web</div>
+              <div class="quick-action-card__sub">Vista pública</div>
+            </a>
+            <button class="quick-action-card" onclick="exportCSV()">
+              <div class="quick-action-card__icon">📊</div>
+              <div class="quick-action-card__label">Exportar CSV</div>
+              <div class="quick-action-card__sub">Asistentes</div>
+            </button>
+          </div>
+
+          <!-- Stats -->
+          <div class="stats-grid" id="statsGrid"></div>
+
+          <!-- Events table -->
+          <div class="table-wrapper" id="eventsTable">
+            <div class="table-wrapper__header">
+              <div class="table-wrapper__title">Tus eventos</div>
+              <a href="event-form.html" class="btn btn--secondary btn--sm">+ Crear evento</a>
+            </div>
+            <div class="table-scroll">
+              <table class="admin-table" id="adminTable">
+                <thead>
+                  <tr>
+                    <th>Evento</th>
+                    <th>Fecha</th>
+                    <th>Sala</th>
+                    <th>Entradas</th>
+                    <th>Estado</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="adminTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- All events section -->
+          <div class="table-wrapper" style="margin-top:var(--space-xl)">
+            <div class="table-wrapper__header">
+              <div class="table-wrapper__title">Todos los eventos (catálogo)</div>
+            </div>
+            <div class="table-scroll">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Evento</th>
+                    <th>Fecha</th>
+                    <th>Sala</th>
+                    <th>Ocupación</th>
+                    <th>Estado</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="catalogTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Delete confirm modal -->
+  <div class="modal-overlay delete-confirm" id="deleteModal">
+    <div class="modal">
+      <h3 style="margin-bottom:var(--space-md)">¿Eliminar evento?</h3>
+      <p style="color:var(--text-secondary);margin-bottom:var(--space-xl)">Esta acción no se puede deshacer. El evento se eliminará del catálogo.</p>
+      <div style="display:flex;gap:var(--space-sm);justify-content:flex-end">
+        <button class="btn btn--secondary" onclick="closeDeleteModal()">Cancelar</button>
+        <button class="btn btn--danger" id="confirmDeleteBtn">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer"></footer>
+
+  <script src="../js/store.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/data.js"></script>
+  <script src="../js/ui.js"></script>
+  <script>
+    let deleteTargetId = null;
+
+    (async () => {
+      UI.renderNavbar({ base: '..', activePage: 'admin' });
+      UI.renderFooter({ base: '..' });
+
+      if (!Auth.requireAdmin()) return;
+
+      const user = Store.user.get();
+      document.getElementById('welcomeMsg').textContent = `Hola, ${user?.name?.split(' ')[0] || 'admin'}. Aquí tienes el resumen del día.`;
+
+      await Data.loadAll();
+
+      const allEvents    = Data.getEvents();
+      const adminEvents  = Store.adminEvents.get();
+      const upcoming     = Data.getUpcomingEvents();
+      const venues       = Data.getVenues();
+      const purchases    = Store.purchases.get();
+
+      // ─── Stats ─────────────────────────────────────────────
+      const totalSold = allEvents.reduce((sum, ev) => {
+        return sum + ev.ticket_types.reduce((s, tt) => s + (tt.capacity - tt.available), 0);
+      }, 0);
+
+      const totalRevenue = totalSold * 12; // mock average
+
+      document.getElementById('statsGrid').innerHTML = `
+        <div class="stat-card">
+          <div class="stat-card__label">Eventos activos</div>
+          <div class="stat-card__value">${upcoming.length}</div>
+          <div class="stat-card__sub">publicados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Entradas vendidas</div>
+          <div class="stat-card__value">${totalSold}</div>
+          <div class="stat-card__sub">en todos los eventos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Ingresos est.</div>
+          <div class="stat-card__value">${totalRevenue.toLocaleString('es-ES')}€</div>
+          <div class="stat-card__sub">datos simulados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Salas</div>
+          <div class="stat-card__value">${venues.length}</div>
+          <div class="stat-card__sub">registradas</div>
+        </div>`;
+
+      // ─── Admin-created events table ─────────────────────────
+      renderAdminTable(adminEvents, venues);
+
+      // ─── Catalog table ─────────────────────────────────────
+      document.getElementById('catalogTableBody').innerHTML = allEvents.map(ev => {
+        const venue = venues.find(v => v.id === ev.venue_id);
+        const sold  = ev.ticket_types.reduce((s, tt) => s + (tt.capacity - tt.available), 0);
+        const total = ev.ticket_types.reduce((s, tt) => s + tt.capacity, 0);
+        const pct   = total > 0 ? Math.round(sold / total * 100) : 0;
+        const dt    = Data.formatDateShort(ev.date);
+
+        return `
+          <tr>
+            <td><img class="event-thumb" src="${ev.cover_image}" alt="${ev.title}" loading="lazy"></td>
+            <td>${ev.title}</td>
+            <td>${dt.day} ${dt.month} ${dt.year}</td>
+            <td>${venue?.name || '—'}</td>
+            <td>
+              <div class="progress-bar"><div class="progress-bar__fill" style="width:${pct}%"></div></div>
+              <div class="progress-label">${sold}/${total} (${pct}%)</div>
+            </td>
+            <td><span class="badge badge--status-${ev.status}">${labelStatus(ev.status)}</span></td>
+            <td>
+              <div class="admin-table__actions">
+                <a href="../event.html?id=${ev.id}" class="btn btn--ghost btn--sm" target="_blank">Ver</a>
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+    })();
+
+    function renderAdminTable(events, venues) {
+      const tbody = document.getElementById('adminTableBody');
+      if (!events.length) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:var(--space-xl);color:var(--text-muted)">
+          No has creado ningún evento todavía. <a href="event-form.html" style="color:var(--accent)">Crea el primero →</a>
+        </td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = events.map(ev => {
+        const venue = venues ? venues.find(v => v.id === ev.venue_id) : null;
+        const sold  = (ev.ticket_types||[]).reduce((s, tt) => s + ((tt.capacity||0) - (tt.available||0)), 0);
+        const total = (ev.ticket_types||[]).reduce((s, tt) => s + (tt.capacity||0), 0);
+        const dt    = Data.formatDateShort(ev.date || new Date().toISOString());
+
+        return `
+          <tr>
+            <td>${ev.title}</td>
+            <td>${dt.day} ${dt.month} ${dt.year}</td>
+            <td>${venue?.name || ev.venue_id || '—'}</td>
+            <td>${sold}/${total}</td>
+            <td><span class="badge badge--status-${ev.status}">${labelStatus(ev.status)}</span></td>
+            <td>
+              <div class="admin-table__actions">
+                <button class="btn btn--ghost btn--sm" onclick="toggleStatus('${ev.id}')">
+                  ${ev.status === 'published' ? 'Despublicar' : 'Publicar'}
+                </button>
+                <a href="event-form.html?edit=${ev.id}" class="btn btn--secondary btn--sm">Editar</a>
+                <button class="btn btn--danger btn--sm" onclick="confirmDelete('${ev.id}')">Eliminar</button>
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+    }
+
+    function labelStatus(s) {
+      return { published: 'Publicado', draft: 'Borrador', past: 'Pasado' }[s] || s;
+    }
+
+    function toggleStatus(id) {
+      Store.adminEvents.toggleStatus(id);
+      UI.toast('Estado actualizado', 'success');
+      const events = Store.adminEvents.get();
+      renderAdminTable(events, Data.getVenues());
+    }
+
+    function confirmDelete(id) {
+      deleteTargetId = id;
+      document.getElementById('deleteModal').classList.add('show');
+      document.getElementById('confirmDeleteBtn').onclick = () => {
+        Store.adminEvents.remove(deleteTargetId);
+        closeDeleteModal();
+        const events = Store.adminEvents.get();
+        renderAdminTable(events, Data.getVenues());
+        UI.toast('Evento eliminado', '');
+      };
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('deleteModal').classList.remove('show');
+      deleteTargetId = null;
+    }
+
+    function exportCSV() {
+      const events = Data.getEvents();
+      const rows   = [['ID', 'Evento', 'Fecha', 'Sala', 'Vendidas', 'Disponibles', 'Estado']];
+      events.forEach(ev => {
+        const venue = Data.getVenues().find(v => v.id === ev.venue_id);
+        const sold  = ev.ticket_types.reduce((s, tt) => s + (tt.capacity - tt.available), 0);
+        const avail = ev.ticket_types.reduce((s, tt) => s + tt.available, 0);
+        rows.push([ev.id, ev.title, ev.date, venue?.name||'', sold, avail, ev.status]);
+      });
+      const csv  = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url; a.download = 'escena-eventos.csv'; a.click();
+      URL.revokeObjectURL(url);
+      UI.toast('CSV descargado', 'success');
+    }
+  </script>
+</body>
+</html>

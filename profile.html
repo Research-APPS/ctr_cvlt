@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi perfil — ESCENA</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    .profile-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: var(--space-2xl);
+      align-items: start;
+    }
+
+    @media (max-width: 800px) {
+      .profile-layout { grid-template-columns: 1fr; }
+    }
+
+    /* Profile sidebar */
+    .profile-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      text-align: center;
+      position: sticky;
+      top: calc(var(--navbar-height) + var(--space-lg));
+    }
+
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      color: var(--accent);
+      margin: 0 auto var(--space-md);
+    }
+
+    .profile-name {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
+    }
+
+    .profile-email {
+      font-size: var(--text-sm);
+      color: var(--text-muted);
+      margin-bottom: var(--space-lg);
+    }
+
+    .profile-role {
+      display: inline-block;
+      margin-bottom: var(--space-xl);
+    }
+
+    .profile-nav {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      text-align: left;
+      border-top: 1px solid var(--border);
+      padding-top: var(--space-lg);
+    }
+
+    .profile-nav-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition);
+      background: none;
+      border: none;
+      text-align: left;
+      width: 100%;
+    }
+
+    .profile-nav-item:hover { background: var(--bg-surface); color: var(--text-primary); }
+    .profile-nav-item.active { background: var(--accent-dim); color: var(--accent); }
+
+    /* Tab content */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Order card */
+    .order-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: var(--space-md);
+      transition: border-color var(--transition);
+    }
+
+    .order-card:hover { border-color: var(--border-hover); }
+
+    .order-card__header {
+      padding: var(--space-md) var(--space-lg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    .order-card__id { font-size: var(--text-xs); font-family: 'Courier New', monospace; color: var(--text-muted); }
+    .order-card__date { font-size: var(--text-xs); color: var(--text-muted); }
+
+    .order-card__body {
+      padding: var(--space-md) var(--space-lg);
+      display: flex;
+      gap: var(--space-md);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .order-card__img {
+      width: 72px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      flex-shrink: 0;
+      background: var(--bg-surface);
+    }
+
+    .order-card__info { flex: 1; min-width: 160px; }
+    .order-card__event-name { font-weight: 700; font-size: var(--text-base); margin-bottom: 2px; }
+    .order-card__event-meta { font-size: var(--text-xs); color: var(--text-muted); }
+    .order-card__total { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); color: var(--accent); }
+
+    /* Edit form */
+    .edit-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar"></header>
+
+  <main class="page-content">
+    <div class="container">
+      <h1 style="margin-bottom:var(--space-xl)">Mi perfil</h1>
+
+      <div class="profile-layout">
+
+        <!-- ─── Sidebar ──────────────────────────────────── -->
+        <aside>
+          <div class="profile-card">
+            <div class="profile-avatar" id="profileAvatar">—</div>
+            <div class="profile-name" id="profileName">—</div>
+            <div class="profile-email" id="profileEmail">—</div>
+            <span class="profile-role badge badge--accent" id="profileRole">Usuario</span>
+
+            <div class="profile-nav">
+              <button class="profile-nav-item active" onclick="showTab('tickets', this)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/></svg>
+                Mis entradas
+              </button>
+              <button class="profile-nav-item" onclick="showTab('favorites', this)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                Favoritos
+              </button>
+              <button class="profile-nav-item" onclick="showTab('edit', this)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Editar perfil
+              </button>
+              <button class="profile-nav-item" onclick="Auth.logout()" style="color:var(--danger)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <!-- ─── Content ──────────────────────────────────── -->
+        <div>
+
+          <!-- Tab: My tickets -->
+          <div class="tab-content active" id="tab-tickets">
+            <h2 style="margin-bottom:var(--space-lg)">Mis entradas</h2>
+            <div id="ticketsList"></div>
+          </div>
+
+          <!-- Tab: Favorites -->
+          <div class="tab-content" id="tab-favorites">
+            <h2 style="margin-bottom:var(--space-lg)">Eventos guardados</h2>
+            <div id="favoritesList"
+              style="display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-md)"></div>
+          </div>
+
+          <!-- Tab: Edit profile -->
+          <div class="tab-content" id="tab-edit">
+            <h2 style="margin-bottom:var(--space-lg)">Editar perfil</h2>
+            <div class="edit-section">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Nombre</label>
+                  <input class="form-input" id="editName" type="text" placeholder="Tu nombre">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Email</label>
+                  <input class="form-input" id="editEmail" type="email" disabled style="opacity:0.5">
+                  <span class="form-hint">El email no se puede cambiar en esta demo</span>
+                </div>
+              </div>
+              <button class="btn btn--primary" onclick="saveProfile()">Guardar cambios</button>
+              <p style="margin-top:var(--space-md);font-size:var(--text-xs);color:var(--text-muted)">
+                ⚠️ Demo: los cambios se guardan en tu dispositivo (localStorage).
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer"></footer>
+
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    (async () => {
+      UI.renderNavbar({ base: '.' });
+      UI.renderFooter({ base: '.' });
+
+      if (!Auth.requireLogin()) return;
+
+      await Data.loadAll();
+
+      const user = Store.user.get();
+
+      // Populate sidebar
+      document.getElementById('profileAvatar').textContent = user.avatar || user.name.charAt(0).toUpperCase();
+      document.getElementById('profileName').textContent   = user.name;
+      document.getElementById('profileEmail').textContent  = user.email;
+      document.getElementById('profileRole').textContent   = user.role === 'admin' ? 'Admin' : 'Usuario';
+      document.getElementById('editName').value  = user.name;
+      document.getElementById('editEmail').value = user.email;
+
+      // Tickets
+      renderTickets();
+
+      // Favorites
+      renderFavorites();
+    })();
+
+    function renderTickets() {
+      const purchases = Store.purchases.get();
+      const list = document.getElementById('ticketsList');
+
+      if (!purchases.length) {
+        list.innerHTML = `<div class="empty-state">
+          <div class="empty-state__icon">🎟</div>
+          <div class="empty-state__title">No tienes entradas aún</div>
+          <p>Cuando compres entradas, las encontrarás aquí.</p>
+          <a href="index.html" class="btn btn--primary" style="margin-top:var(--space-md)">Ver conciertos</a>
+        </div>`;
+        return;
+      }
+
+      list.innerHTML = purchases.map(order => {
+        const event = order.event_id ? Data.getEvent(order.event_id) : null;
+        const venue = event ? Data.getVenue(event.venue_id) : null;
+        const dt    = event ? Data.formatDateShort(event.date) : null;
+        const isUpcoming = event ? Data.isUpcoming(event.date) : false;
+
+        return `
+          <div class="order-card">
+            <div class="order-card__header">
+              <span class="order-card__id">Ref: ${order.id}</span>
+              <div style="display:flex;gap:var(--space-sm);align-items:center">
+                <span class="badge badge--status-${isUpcoming ? 'published' : 'past'}">${isUpcoming ? 'Próximo' : 'Pasado'}</span>
+                <span class="order-card__date">${new Date(order.paid_at).toLocaleDateString('es-ES')}</span>
+              </div>
+            </div>
+            <div class="order-card__body">
+              ${event ? `<img class="order-card__img" src="${event.cover_image}" alt="${event.title}" loading="lazy">` : ''}
+              <div class="order-card__info">
+                <div class="order-card__event-name">${event?.title || order.event_title || 'Evento'}</div>
+                <div class="order-card__event-meta">
+                  ${dt ? `${dt.day} ${dt.month} ${dt.year}` : ''}
+                  ${venue ? ` · ${venue.name}` : ''}
+                </div>
+                <div class="order-card__event-meta" style="margin-top:4px">
+                  ${(order.items||[]).map(i => `${i.ticket_type_name} × ${i.quantity}`).join(', ')}
+                </div>
+              </div>
+              <div class="order-card__total">${Data.formatPrice(order.total || 0)}</div>
+              <div style="display:flex;gap:var(--space-xs)">
+                <a href="ticket.html?order=${order.id}" class="btn btn--secondary btn--sm">Ver entrada</a>
+                ${event ? `<a href="event.html?id=${event.id}" class="btn btn--ghost btn--sm">Evento →</a>` : ''}
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function renderFavorites() {
+      const favIds = Store.favorites.get();
+      const grid = document.getElementById('favoritesList');
+
+      if (!favIds.length) {
+        grid.style.display = 'block';
+        grid.innerHTML = `<div class="empty-state">
+          <div class="empty-state__icon">❤️</div>
+          <div class="empty-state__title">Sin favoritos aún</div>
+          <p>Guarda eventos desde la ficha de concierto para encontrarlos aquí.</p>
+          <a href="index.html" class="btn btn--primary" style="margin-top:var(--space-md)">Explorar conciertos</a>
+        </div>`;
+        return;
+      }
+
+      const events = favIds.map(id => Data.getEvent(id)).filter(Boolean);
+      const venues = Data.getVenues();
+      grid.innerHTML = events.map(e => Data.renderEventCard(e, venues, [])).join('');
+    }
+
+    function saveProfile() {
+      const name = document.getElementById('editName').value.trim();
+      if (!name) { UI.toast('El nombre no puede estar vacío', 'error'); return; }
+      const user = Store.user.get();
+      user.name   = name;
+      user.avatar = name.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
+      Store.user.set(user);
+
+      document.getElementById('profileName').textContent   = name;
+      document.getElementById('profileAvatar').textContent = user.avatar;
+      UI.toast('Perfil actualizado', 'success');
+    }
+
+    function showTab(tab, btn) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.profile-nav-item').forEach(b => b.classList.remove('active'));
+      document.getElementById(`tab-${tab}`)?.classList.add('active');
+      btn.classList.add('active');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+[
+  {
+    "id": "venue-001",
+    "name": "Sala Vesta",
+    "city": "Madrid",
+    "address": "Calle de la Palma, 62, 28015 Madrid",
+    "description": "Sala Vesta es uno de los espacios de música independiente más relevantes de Malasaña. Con capacidad para 300 personas, su sonido inmejorable y su programación comprometida la han convertido en un referente de la escena underground madrileña desde 2014.",
+    "description_short": "La sala de referencia de Malasaña.",
+    "image": "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=1200&h=500&fit=crop&auto=format",
+    "capacity": 300,
+    "map_embed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3036.923591!2d-3.7037!3d40.4264!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDDCsDI1JzM1LjAiTiAzwrA0MicxMy4zIlc!5e0!3m2!1ses!2ses!4v1",
+    "transport": "Metro: Tribunal (L10) o Noviciado (L2). Bus: líneas 147, 40.",
+    "event_ids": ["evt-001", "evt-002", "evt-005"],
+    "past_event_ids": ["evt-003", "evt-004"]
+  },
+  {
+    "id": "venue-002",
+    "name": "Club Moog",
+    "city": "Barcelona",
+    "address": "Carrer de l'Arc del Teatre, 3, 08001 Barcelona",
+    "description": "Club Moog es una sala histórica del Barrio Gótico barcelonés, pionera de la cultura electrónica en España desde 1989. Dos plantas, dos sonidos distintos y décadas de historia en cada ladrillo.",
+    "description_short": "Electrónica histórica en el Barrio Gótico.",
+    "image": "https://images.unsplash.com/photo-1429514513361-d64a9c12d4a0?w=1200&h=500&fit=crop&auto=format",
+    "capacity": 200,
+    "map_embed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2993.5!2d2.1734!3d41.3784!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDHCsDIyJzQyLjIiTiAywrAxMCcyNC4yIkU!5e0!3m2!1ses!2ses!4v1",
+    "transport": "Metro: Drassanes (L3). Bus: líneas 14, 59, 91.",
+    "event_ids": ["evt-002"],
+    "past_event_ids": ["evt-004"]
+  }
+]

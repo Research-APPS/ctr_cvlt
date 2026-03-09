@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/ivansimo/.claude/projects/-Users-ivansimo-Documents-2026-RADIOMICELIO-ctr_cvlt/memory/**)"
+    ]
+  }
+}

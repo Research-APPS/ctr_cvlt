@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Artista — ESCENA</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    .artist-hero {
+      position: relative;
+      min-height: 420px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+      margin-top: var(--navbar-height);
+      background: var(--bg-surface);
+    }
+
+    .artist-hero__bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.35;
+    }
+
+    .artist-hero__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10,10,10,1) 0%, rgba(10,10,10,0.5) 60%, rgba(10,10,10,0.1) 100%);
+    }
+
+    .artist-hero__content {
+      position: relative;
+      z-index: 1;
+      padding: var(--space-2xl) var(--space-lg);
+      width: 100%;
+      display: flex;
+      align-items: flex-end;
+      gap: var(--space-xl);
+    }
+
+    .artist-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid var(--accent);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .artist-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .artist-info__genres {
+      display: flex;
+      gap: var(--space-xs);
+      flex-wrap: wrap;
+      margin-bottom: var(--space-sm);
+    }
+
+    .artist-name { font-size: var(--text-4xl); font-weight: 700; margin-bottom: var(--space-sm); }
+
+    .artist-bio-short { color: var(--text-secondary); max-width: 600px; }
+
+    .social-links {
+      display: flex;
+      gap: var(--space-sm);
+      flex-wrap: wrap;
+      margin-top: var(--space-md);
+    }
+
+    .social-link {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      transition: all var(--transition);
+    }
+
+    .social-link:hover { border-color: var(--accent); color: var(--accent); }
+
+    @media (max-width: 600px) {
+      .artist-hero__content { flex-direction: column; align-items: flex-start; }
+      .artist-avatar { width: 80px; height: 80px; }
+      .artist-name { font-size: var(--text-3xl); }
+    }
+
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-md);
+    }
+
+    @media (max-width: 900px) { .events-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 500px) { .events-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="navbar"></header>
+
+  <section class="artist-hero">
+    <img class="artist-hero__bg" id="artistBg" src="" alt="">
+    <div class="artist-hero__overlay"></div>
+    <div class="container">
+      <div class="artist-hero__content">
+        <div class="artist-avatar">
+          <img id="artistAvatar" src="" alt="">
+        </div>
+        <div>
+          <nav class="breadcrumb" id="breadcrumb" style="margin-bottom:var(--space-sm)"></nav>
+          <div class="artist-info__genres" id="artistGenres"></div>
+          <h1 class="artist-name" id="artistName">Cargando...</h1>
+          <p class="artist-bio-short" id="artistBioShort"></p>
+          <div class="social-links" id="socialLinks"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <div class="container" style="padding-top:var(--space-2xl);padding-bottom:var(--space-3xl)">
+
+      <!-- Bio full -->
+      <div style="max-width:720px;margin-bottom:var(--space-2xl)">
+        <h2 class="section-title">Sobre el artista</h2>
+        <p id="artistBioFull" style="font-size:var(--text-base);line-height:1.9;color:var(--text-secondary)"></p>
+      </div>
+
+      <!-- Video -->
+      <div style="max-width:720px;margin-bottom:var(--space-2xl)" id="videoSection">
+        <h2 class="section-title">Escucha</h2>
+        <div class="video-embed" id="videoEmbed"></div>
+      </div>
+
+      <!-- Upcoming -->
+      <div style="margin-bottom:var(--space-2xl)">
+        <h2 class="section-title">Próximos conciertos</h2>
+        <div class="events-grid" id="upcomingGrid"></div>
+      </div>
+
+      <!-- Past -->
+      <div>
+        <h2 class="section-title">Conciertos pasados</h2>
+        <div class="events-grid" id="pastGrid"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="footer"></footer>
+
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    (async () => {
+      UI.renderNavbar({ base: '.' });
+      UI.renderFooter({ base: '.' });
+
+      await Data.loadAll();
+
+      const artistId = Data.getURLParam('id');
+      if (!artistId) { window.location.href = 'index.html'; return; }
+
+      const artist = Data.getArtist(artistId);
+      if (!artist) { window.location.href = 'index.html'; return; }
+
+      document.title = `${artist.name} — ESCENA`;
+
+      document.getElementById('artistBg').src       = artist.cover_image || artist.image;
+      document.getElementById('artistAvatar').src   = artist.image;
+      document.getElementById('artistName').textContent     = artist.name;
+      document.getElementById('artistBioShort').textContent = artist.bio_short || '';
+      document.getElementById('artistBioFull').textContent  = artist.bio || '';
+
+      document.getElementById('breadcrumb').innerHTML = `
+        <a href="index.html">Inicio</a>
+        <span class="breadcrumb__sep">/</span>
+        <span class="breadcrumb__current">${artist.name}</span>`;
+
+      document.getElementById('artistGenres').innerHTML =
+        (artist.genres || []).map(g => `<span class="badge badge--genre">${g}</span>`).join('');
+
+      // Social links
+      const links = artist.social_links || {};
+      const linkLabels = { instagram: 'Instagram', spotify: 'Spotify', bandcamp: 'Bandcamp', soundcloud: 'SoundCloud', youtube: 'YouTube' };
+      document.getElementById('socialLinks').innerHTML = Object.entries(links)
+        .filter(([,url]) => url)
+        .map(([key, url]) => `<a href="${url}" class="social-link" target="_blank" rel="noopener">${linkLabels[key] || key}</a>`)
+        .join('');
+
+      // Video
+      if (artist.youtube_url) {
+        document.getElementById('videoEmbed').innerHTML =
+          `<iframe src="${artist.youtube_url}" allowfullscreen title="${artist.name}" loading="lazy"></iframe>`;
+      } else {
+        document.getElementById('videoSection').style.display = 'none';
+      }
+
+      // Events
+      const artistEvents = Data.getEventsByArtist(artistId);
+      const venues  = Data.getVenues();
+      const upcoming = artistEvents.filter(e => Data.isUpcoming(e.date) && e.status !== 'past');
+      const past     = artistEvents.filter(e => !Data.isUpcoming(e.date) || e.status === 'past');
+
+      const upGrid = document.getElementById('upcomingGrid');
+      if (upcoming.length) {
+        upGrid.innerHTML = upcoming.map(e => Data.renderEventCard(e, venues, [])).join('');
+      } else {
+        upGrid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+          <div class="empty-state__icon">🎵</div>
+          <p>No hay próximas fechas anunciadas</p>
+        </div>`;
+      }
+
+      const pastGrid = document.getElementById('pastGrid');
+      if (past.length) {
+        pastGrid.innerHTML = past.map(e => Data.renderEventCard(e, venues, [])).join('');
+      } else {
+        pastGrid.innerHTML = `<p style="color:var(--text-muted);font-size:var(--text-sm)">Sin historial aún.</p>`;
+      }
+    })();
+  </script>
+</body>
+</html>

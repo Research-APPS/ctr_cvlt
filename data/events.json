@@ -1,0 +1,153 @@
+[
+  {
+    "id": "evt-001",
+    "title": "Radio Micelio",
+    "subtitle": "Presentación de 'Hyphal Networks' + Texas Red",
+    "slug": "radio-micelio-hyphal-networks",
+    "date": "2026-04-12T21:00:00",
+    "time_doors": "20:00",
+    "time_start": "21:00",
+    "venue_id": "venue-001",
+    "artist_ids": ["artist-001"],
+    "supporting_artist_ids": ["artist-002"],
+    "cover_image": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1200&h=600&fit=crop&auto=format",
+    "gallery": [
+      "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=500&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800&h=500&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&h=500&fit=crop&auto=format"
+    ],
+    "youtube_url": "https://www.youtube.com/embed/jfKfPfyJRdk",
+    "ticket_types": [
+      {"id": "tt-001a", "name": "Anticipada", "price": 12, "capacity": 200, "available": 73},
+      {"id": "tt-001b", "name": "General", "price": 15, "capacity": 100, "available": 100}
+    ],
+    "description_short": "Radio Micelio presenta en Madrid su nuevo álbum 'Hyphal Networks', un viaje sonoro de 52 minutos que explora las redes invisibles bajo la tierra. Con Texas Red como telonero.",
+    "description_long": "Radio Micelio vuelve a Sala Vesta para presentar en exclusiva 'Hyphal Networks', su tercer álbum de estudio. Un trabajo que tardó dos años en gestarse y que supone su inmersión más profunda en la música ambiental y experimental.\n\nEl título hace referencia a las redes de hifas que conectan los árboles en los bosques, y esa metáfora vertebra todo el disco: conexión, comunicación invisible, sistemas vivos. El resultado es un álbum que suena como si la tierra respirara.\n\nComo invitado especial, Texas Red abrirá la noche con su blues electrónico directo y sin adornos. Una combinación que promete una noche de sonidos que se complementan en su diferencia.",
+    "genres": ["Experimental", "Ambient", "Post-rock"],
+    "age_policy": "+18",
+    "faq": [
+      {"q": "¿Hay zona de guardarropa?", "a": "Sí, disponible por 2€."},
+      {"q": "¿Se puede llevar cámara?", "a": "Se permiten cámaras sin objetivo intercambiable. No se permiten cámaras réflex."},
+      {"q": "¿Cuál es la política de devolución?", "a": "Las entradas no son reembolsables, pero pueden cederse a otra persona."}
+    ],
+    "status": "published",
+    "featured": true
+  },
+  {
+    "id": "evt-002",
+    "title": "Crystalline",
+    "subtitle": "Club Night — Techno Melódico",
+    "slug": "crystalline-club-night",
+    "date": "2026-04-19T23:00:00",
+    "time_doors": "23:00",
+    "time_start": "23:30",
+    "venue_id": "venue-002",
+    "artist_ids": ["artist-003"],
+    "supporting_artist_ids": [],
+    "cover_image": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1200&h=600&fit=crop&auto=format",
+    "gallery": [
+      "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=500&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1429514513361-d64a9c12d4a0?w=800&h=500&fit=crop&auto=format"
+    ],
+    "youtube_url": "https://www.youtube.com/embed/jfKfPfyJRdk",
+    "ticket_types": [
+      {"id": "tt-002a", "name": "Early Bird", "price": 8, "capacity": 50, "available": 0},
+      {"id": "tt-002b", "name": "Anticipada", "price": 12, "capacity": 100, "available": 34},
+      {"id": "tt-002c", "name": "General", "price": 18, "capacity": 50, "available": 50}
+    ],
+    "description_short": "Crystalline lleva el techno melódico europeo al Club Moog de Barcelona. Una noche de rave íntima con sonido de alta fidelidad.",
+    "description_long": "Crystalline regresa a Barcelona para una noche en el icónico Club Moog. La productora barcelonesa presenta un set de más de tres horas que repasa su catálogo y avanza material nuevo.\n\nConocida por construir viajes sonoros que combinan la energía del dancefloor con la complejidad compositiva de la música clásica contemporánea, sus actuaciones en vivo son experiencias sensoriales únicas.\n\nEspera bajos profundos, melodías que te persiguen días después y una atmósfera que hace del Moog el mejor escenario posible.",
+    "genres": ["Techno", "Melodic", "Electronic"],
+    "age_policy": "+18",
+    "faq": [
+      {"q": "¿Hay lista de invitados?", "a": "No hay lista. Toda la venta es online."},
+      {"q": "¿Hay consumición incluida?", "a": "No. La entrada es solo para el concierto."}
+    ],
+    "status": "published",
+    "featured": false
+  },
+  {
+    "id": "evt-003",
+    "title": "Radio Micelio",
+    "subtitle": "Sesión Íntima — Sala Vesta",
+    "slug": "radio-micelio-sesion-intima",
+    "date": "2025-11-08T21:00:00",
+    "time_doors": "20:30",
+    "time_start": "21:00",
+    "venue_id": "venue-001",
+    "artist_ids": ["artist-001"],
+    "supporting_artist_ids": [],
+    "cover_image": "https://images.unsplash.com/photo-1598387993441-a364f854b158?w=1200&h=600&fit=crop&auto=format",
+    "gallery": [
+      "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800&h=500&fit=crop&auto=format"
+    ],
+    "youtube_url": "https://www.youtube.com/embed/jfKfPfyJRdk",
+    "ticket_types": [
+      {"id": "tt-003a", "name": "General", "price": 10, "capacity": 100, "available": 0}
+    ],
+    "description_short": "Una sesión íntima de Radio Micelio en formato reducido. Aforo limitado a 100 personas.",
+    "description_long": "Radio Micelio ofreció una sesión íntima en Sala Vesta con aforo reducido a 100 personas. Una experiencia única para los fans más cercanos antes de la gira de presentación del nuevo álbum.",
+    "genres": ["Experimental", "Ambient"],
+    "age_policy": "Todos los públicos",
+    "faq": [],
+    "status": "past",
+    "featured": false
+  },
+  {
+    "id": "evt-004",
+    "title": "Crystalline b2b Heliox",
+    "subtitle": "Noche especial de techno en el Moog",
+    "slug": "crystalline-b2b-heliox",
+    "date": "2025-10-25T23:00:00",
+    "time_doors": "23:00",
+    "time_start": "23:30",
+    "venue_id": "venue-002",
+    "artist_ids": ["artist-003"],
+    "supporting_artist_ids": [],
+    "cover_image": "https://images.unsplash.com/photo-1429514513361-d64a9c12d4a0?w=1200&h=600&fit=crop&auto=format",
+    "gallery": [],
+    "youtube_url": "https://www.youtube.com/embed/jfKfPfyJRdk",
+    "ticket_types": [
+      {"id": "tt-004a", "name": "General", "price": 12, "capacity": 200, "available": 0}
+    ],
+    "description_short": "Crystalline y Heliox se juntaron en el Club Moog para una noche de back-to-back que agotó entradas en 48 horas.",
+    "description_long": "Una de las noches más recordadas de la temporada en el Club Moog. Crystalline y Heliox se turnaron en los platos durante cinco horas en un b2b que pasará a la historia de la sala.",
+    "genres": ["Techno", "Electronic"],
+    "age_policy": "+18",
+    "faq": [],
+    "status": "past",
+    "featured": false
+  },
+  {
+    "id": "evt-005",
+    "title": "Marea Negra",
+    "subtitle": "Gira 'Sal y Carbón' — Madrid",
+    "slug": "marea-negra-sal-y-carbon",
+    "date": "2026-05-03T21:30:00",
+    "time_doors": "20:30",
+    "time_start": "21:30",
+    "venue_id": "venue-001",
+    "artist_ids": ["artist-004"],
+    "supporting_artist_ids": [],
+    "cover_image": "https://images.unsplash.com/photo-1540039155194-6a698c14b0a9?w=1200&h=600&fit=crop&auto=format",
+    "gallery": [
+      "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=500&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800&h=500&fit=crop&auto=format"
+    ],
+    "youtube_url": "https://www.youtube.com/embed/jfKfPfyJRdk",
+    "ticket_types": [
+      {"id": "tt-005a", "name": "Anticipada", "price": 10, "capacity": 150, "available": 92},
+      {"id": "tt-005b", "name": "General", "price": 13, "capacity": 150, "available": 150}
+    ],
+    "description_short": "Marea Negra presenta en Sala Vesta su segundo álbum 'Sal y Carbón'. Post-punk oscuro y canciones que duelen en el sitio justo.",
+    "description_long": "Marea Negra lleva 'Sal y Carbón' a Sala Vesta en una noche que promete ser de las que no se olvidan. El dúo bilbaíno ha construido en los últimos tres años uno de los sonidos más personales de la escena indie española.\n\nSu segundo álbum es un disco de ruptura, de proceso y de reconstrucción. Ocho canciones directas, sin artificios, que suenan mejor en un local oscuro con gente que las conoce de memoria.",
+    "genres": ["Post-punk", "Indie", "Dark"],
+    "age_policy": "+16",
+    "faq": [
+      {"q": "¿Es un concierto de pie?", "a": "Sí, es concierto de pie. No hay zona sentada."},
+      {"q": "¿Hay telonero?", "a": "Pendiente de confirmar."}
+    ],
+    "status": "published",
+    "featured": false
+  }
+]

@@ -1,0 +1,65 @@
+[
+  {
+    "id": "artist-001",
+    "name": "Radio Micelio",
+    "bio": "Radio Micelio es un proyecto de música experimental y electrónica nacido en Madrid a finales de 2019. Su sonido fusiona ambient, post-rock y texturas industriales en un viaje sonoro que explora los límites entre lo orgánico y lo digital.",
+    "bio_short": "Música experimental y electrónica desde Madrid.",
+    "image": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=800&h=800&fit=crop&auto=format",
+    "cover_image": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1200&h=500&fit=crop&auto=format",
+    "youtube_url": "https://www.youtube.com/embed/jfKfPfyJRdk",
+    "social_links": {
+      "instagram": "https://instagram.com",
+      "spotify": "https://spotify.com",
+      "bandcamp": "https://bandcamp.com",
+      "soundcloud": "https://soundcloud.com"
+    },
+    "genres": ["Experimental", "Ambient", "Electronic"],
+    "event_ids": ["evt-001", "evt-003"]
+  },
+  {
+    "id": "artist-002",
+    "name": "Texas Red",
+    "bio": "Texas Red trae desde Bilbao un blues electrónico sucio y honesto. Guitarras distorsionadas, ritmos propulsivos y letras en castellano que hablan de carretera, soledad y redención.",
+    "bio_short": "Blues electrónico desde Bilbao.",
+    "image": "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800&h=800&fit=crop&auto=format",
+    "cover_image": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1200&h=500&fit=crop&auto=format",
+    "youtube_url": "https://www.youtube.com/embed/jfKfPfyJRdk",
+    "social_links": {
+      "instagram": "https://instagram.com",
+      "spotify": "https://spotify.com"
+    },
+    "genres": ["Blues", "Rock", "Electric"],
+    "event_ids": ["evt-001"]
+  },
+  {
+    "id": "artist-003",
+    "name": "Crystalline",
+    "bio": "Crystalline es el alias de la productora barcelonesa Laura V., una de las voces más interesantes del techno melódico europeo. Sus sets y producciones combinan rave culture con estructuras compositivas de música clásica contemporánea.",
+    "bio_short": "Techno melódico desde Barcelona.",
+    "image": "https://images.unsplash.com/photo-1598387993441-a364f854b158?w=800&h=800&fit=crop&auto=format",
+    "cover_image": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1200&h=500&fit=crop&auto=format",
+    "youtube_url": "https://www.youtube.com/embed/jfKfPfyJRdk",
+    "social_links": {
+      "instagram": "https://instagram.com",
+      "spotify": "https://spotify.com",
+      "soundcloud": "https://soundcloud.com"
+    },
+    "genres": ["Techno", "Electronic", "Melodic"],
+    "event_ids": ["evt-002", "evt-004"]
+  },
+  {
+    "id": "artist-004",
+    "name": "Marea Negra",
+    "bio": "Post-punk oscuro y poesía en castellano. Marea Negra lleva desde 2017 agitando salas con una energía en directo que combina Joy Division, Los Planetas y algo completamente propio.",
+    "bio_short": "Post-punk en castellano.",
+    "image": "https://images.unsplash.com/photo-1540039155194-6a698c14b0a9?w=800&h=800&fit=crop&auto=format",
+    "cover_image": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=1200&h=500&fit=crop&auto=format",
+    "youtube_url": "https://www.youtube.com/embed/jfKfPfyJRdk",
+    "social_links": {
+      "instagram": "https://instagram.com",
+      "spotify": "https://spotify.com"
+    },
+    "genres": ["Post-punk", "Indie", "Dark"],
+    "event_ids": ["evt-005"]
+  }
+]

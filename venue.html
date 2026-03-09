@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sala — ESCENA</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    .venue-hero {
+      position: relative;
+      min-height: 400px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+      margin-top: var(--navbar-height);
+      background: var(--bg-surface);
+    }
+
+    .venue-hero__bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.4;
+    }
+
+    .venue-hero__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10,10,10,1) 0%, rgba(10,10,10,0.5) 60%, rgba(10,10,10,0.1) 100%);
+    }
+
+    .venue-hero__content {
+      position: relative;
+      z-index: 1;
+      padding: var(--space-2xl) var(--space-lg);
+      width: 100%;
+    }
+
+    .venue-city {
+      font-size: var(--text-xs);
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: var(--space-sm);
+    }
+
+    .venue-name {
+      font-size: var(--text-4xl);
+      font-weight: 700;
+      margin-bottom: var(--space-sm);
+    }
+
+    .venue-meta {
+      display: flex;
+      gap: var(--space-lg);
+      flex-wrap: wrap;
+    }
+
+    .venue-meta-item {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    .venue-layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: var(--space-2xl);
+      padding: var(--space-2xl) 0;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .venue-layout { grid-template-columns: 1fr; }
+    }
+
+    .venue-sidebar-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-lg);
+      position: sticky;
+      top: calc(var(--navbar-height) + var(--space-lg));
+    }
+
+    .venue-sidebar-card h4 {
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: var(--space-md);
+      font-weight: 700;
+    }
+
+    .venue-info-row {
+      display: flex;
+      gap: var(--space-sm);
+      align-items: flex-start;
+      padding: var(--space-sm) 0;
+      border-bottom: 1px solid var(--border);
+      font-size: var(--text-sm);
+    }
+
+    .venue-info-row:last-child { border-bottom: none; }
+    .venue-info-row svg { color: var(--accent); flex-shrink: 0; margin-top: 2px; }
+    .venue-info-row p { color: var(--text-secondary); line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <header class="navbar"></header>
+
+  <section class="venue-hero">
+    <img class="venue-hero__bg" id="venueBg" src="" alt="">
+    <div class="venue-hero__overlay"></div>
+    <div class="container">
+      <div class="venue-hero__content">
+        <nav class="breadcrumb" id="breadcrumb"></nav>
+        <div class="venue-city" id="venueCity"></div>
+        <h1 class="venue-name" id="venueName">Cargando...</h1>
+        <div class="venue-meta" id="venueMeta"></div>
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <div class="container">
+      <div class="venue-layout">
+
+        <div>
+          <!-- Description -->
+          <div class="content-section" style="margin-bottom:var(--space-2xl)">
+            <p id="venueDesc" style="font-size:var(--text-lg);line-height:1.8;color:var(--text-secondary)"></p>
+          </div>
+
+          <!-- Upcoming at this venue -->
+          <div style="margin-bottom:var(--space-2xl)">
+            <h2 class="section-title">Próximos conciertos aquí</h2>
+            <div class="events-grid" id="upcomingGrid"
+              style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-md)"></div>
+          </div>
+
+          <!-- Past at this venue -->
+          <div>
+            <h2 class="section-title">Conciertos pasados</h2>
+            <div class="events-grid" id="pastGrid"
+              style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-md)"></div>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <aside>
+          <div class="venue-sidebar-card">
+            <h4>Información de la sala</h4>
+            <div id="venueInfoRows"></div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer"></footer>
+
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    (async () => {
+      UI.renderNavbar({ base: '.' });
+      UI.renderFooter({ base: '.' });
+
+      await Data.loadAll();
+
+      const venueId = Data.getURLParam('id');
+      if (!venueId) { window.location.href = 'index.html'; return; }
+
+      const venue = Data.getVenue(venueId);
+      if (!venue) { window.location.href = 'index.html'; return; }
+
+      document.title = `${venue.name} — ESCENA`;
+      document.getElementById('venueBg').src = venue.image;
+      document.getElementById('venueCity').textContent = venue.city;
+      document.getElementById('venueName').textContent = venue.name;
+      document.getElementById('venueDesc').textContent = venue.description || '';
+
+      document.getElementById('breadcrumb').innerHTML = `
+        <a href="index.html">Inicio</a>
+        <span class="breadcrumb__sep">/</span>
+        <span class="breadcrumb__current">${venue.name}</span>`;
+
+      document.getElementById('venueMeta').innerHTML = `
+        <span class="venue-meta-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          Aforo: ${venue.capacity} personas
+        </span>
+        <span class="venue-meta-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+          ${venue.address}
+        </span>`;
+
+      // Sidebar info
+      document.getElementById('venueInfoRows').innerHTML = `
+        <div class="venue-info-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+          <p>${venue.address}</p>
+        </div>
+        <div class="venue-info-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          <p>Aforo: ${venue.capacity} personas</p>
+        </div>
+        ${venue.transport ? `
+        <div class="venue-info-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M7 8V6a2 2 0 012-2h6a2 2 0 012 2v2"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+          <p>${venue.transport}</p>
+        </div>` : ''}`;
+
+      // Events
+      const allEvents = Data.getEvents();
+      const venueEvents = allEvents.filter(e => e.venue_id === venueId);
+      const upcoming = venueEvents.filter(e => Data.isUpcoming(e.date) && e.status !== 'past');
+      const past     = venueEvents.filter(e => !Data.isUpcoming(e.date) || e.status === 'past');
+
+      const upGrid = document.getElementById('upcomingGrid');
+      if (upcoming.length) {
+        upGrid.innerHTML = upcoming.map(e => Data.renderEventCard(e, [venue], [])).join('');
+      } else {
+        upGrid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+          <div class="empty-state__icon">🎵</div>
+          <p>No hay próximos conciertos anunciados</p>
+        </div>`;
+      }
+
+      const pastGrid = document.getElementById('pastGrid');
+      if (past.length) {
+        pastGrid.innerHTML = past.map(e => Data.renderEventCard(e, [venue], [])).join('');
+      } else {
+        pastGrid.innerHTML = `<p style="color:var(--text-muted);font-size:var(--text-sm)">Sin historial aún.</p>`;
+      }
+    })();
+  </script>
+</body>
+</html>
