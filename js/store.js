@@ -11,6 +11,7 @@ const Store = (() => {
     FAVORITES:     'escena_favorites',
     ADMIN_EVENTS:  'escena_admin_events',
     DEMO_BANNER:   'escena_demo_banner',
+    VALIDATIONS:   'escena_validations',
   };
 
   // ─── Generic helpers ──────────────────────────────────────
@@ -112,7 +113,21 @@ const Store = (() => {
     },
   };
 
-  return { user, cart, purchases, favorites, adminEvents };
+  // ─── Validations (ticket scanning) ───────────────────────
+  const validations = {
+    get: () => get(KEYS.VALIDATIONS, {}),
+    validate: (orderId) => {
+      const all = get(KEYS.VALIDATIONS, {});
+      if (all[orderId]) return false; // ya usada
+      all[orderId] = { validated: true, validated_at: new Date().toISOString() };
+      set(KEYS.VALIDATIONS, all);
+      return true;
+    },
+    isUsed: (orderId) => !!get(KEYS.VALIDATIONS, {})[orderId],
+    clear: () => set(KEYS.VALIDATIONS, {}),
+  };
+
+  return { user, cart, purchases, favorites, adminEvents, validations };
 })();
 
 // Make globally available

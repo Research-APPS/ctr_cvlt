@@ -297,14 +297,7 @@
             <div class="ticket-card__buyer" id="ticketBuyer">—</div>
           </div>
           <div class="qr-block">
-            <div class="qr-code">
-              <div class="qr-inner"></div>
-              <div class="qr-corners">
-                <div class="qr-corner qr-corner--tl"></div>
-                <div class="qr-corner qr-corner--tr"></div>
-                <div class="qr-corner qr-corner--bl"></div>
-              </div>
-            </div>
+            <div class="qr-code" id="qrContainer"></div>
             <div class="qr-label" id="qrLabel">—</div>
           </div>
         </div>
@@ -363,6 +356,7 @@
 
   <footer class="footer"></footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
   <script src="js/store.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/data.js"></script>
@@ -418,6 +412,18 @@
       // Localizador
       document.getElementById('ticketLocator').textContent = orderId;
       document.getElementById('qrLabel').textContent = orderId.slice(0,14) + '...';
+
+      // QR real escaneable
+      const qrData = order.qr_data || `ESCENA-${orderId}`;
+      document.getElementById('qrContainer').innerHTML = '';
+      new QRCode(document.getElementById('qrContainer'), {
+        text: qrData,
+        width: 104,
+        height: 104,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H,
+      });
 
       // Tipo y comprador
       const typeNames = (order.items || []).map(i => `${i.ticket_type_name} × ${i.quantity}`).join(', ');

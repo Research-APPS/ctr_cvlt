@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validador de entradas — ESCENA</title>
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <style>
+    .scanner-page {
+      max-width: 540px;
+      margin: 0 auto;
+      padding: var(--space-xl) var(--space-md) var(--space-3xl);
+    }
+
+    .scanner-header {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+    }
+
+    .scanner-header h1 {
+      font-size: var(--text-2xl);
+      margin-bottom: var(--space-xs);
+    }
+
+    /* Stats strip */
+    .scanner-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-sm);
+      margin-bottom: var(--space-xl);
+    }
+
+    .scanner-stat {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-md);
+      text-align: center;
+    }
+
+    .scanner-stat__value {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .scanner-stat__label {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 2px;
+    }
+
+    /* Camera viewport */
+    .scanner-viewport {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      background: #000;
+      border: 2px solid var(--border);
+      margin-bottom: var(--space-xl);
+    }
+
+    #scannerVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Corner guides */
+    .scanner-guide {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .scanner-guide::before,
+    .scanner-guide::after {
+      content: '';
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--accent);
+    }
+
+    .scanner-guide::before {
+      top: 16px; left: 16px;
+      border-right: none; border-bottom: none;
+      border-radius: 4px 0 0 0;
+    }
+
+    .scanner-guide::after {
+      bottom: 16px; right: 16px;
+      border-left: none; border-top: none;
+      border-radius: 0 0 4px 0;
+    }
+
+    /* Extra corners via extra elements */
+    .scanner-guide-br::before {
+      content: '';
+      position: absolute;
+      top: 16px; right: 16px;
+      width: 48px; height: 48px;
+      border: 3px solid var(--accent);
+      border-left: none; border-bottom: none;
+      border-radius: 0 4px 0 0;
+    }
+
+    .scanner-guide-br::after {
+      content: '';
+      position: absolute;
+      bottom: 16px; left: 16px;
+      width: 48px; height: 48px;
+      border: 3px solid var(--accent);
+      border-right: none; border-top: none;
+      border-radius: 0 0 0 4px;
+    }
+
+    /* Scan line animation */
+    .scanner-line {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      animation: scan-sweep 2s linear infinite;
+      top: 0;
+      pointer-events: none;
+    }
+
+    @keyframes scan-sweep {
+      0%   { top: 20px; opacity: 1; }
+      90%  { top: calc(100% - 20px); opacity: 1; }
+      100% { top: calc(100% - 20px); opacity: 0; }
+    }
+
+    /* Camera error */
+    .camera-error {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-md);
+      padding: var(--space-2xl);
+      text-align: center;
+      color: var(--text-muted);
+      position: absolute;
+      inset: 0;
+      background: var(--bg-card);
+    }
+
+    .camera-error.show { display: flex; }
+
+    /* Result panel */
+    .scan-result {
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      text-align: center;
+      margin-bottom: var(--space-xl);
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      transition: border-color 0.3s ease, background 0.3s ease;
+    }
+
+    .scan-result--valid   { border-color: var(--success); background: rgba(0,214,123,0.06); }
+    .scan-result--used    { border-color: #ffaa00;        background: rgba(255,170,0,0.06); }
+    .scan-result--invalid { border-color: var(--danger);  background: rgba(255,68,68,0.06); }
+    .scan-result--waiting { border-color: var(--border); }
+
+    .scan-result__icon {
+      font-size: 3rem;
+      line-height: 1;
+    }
+
+    .scan-result__status {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .scan-result__status--valid   { color: var(--success); }
+    .scan-result__status--used    { color: #ffaa00; }
+    .scan-result__status--invalid { color: var(--danger); }
+    .scan-result__status--waiting { color: var(--text-muted); }
+
+    .scan-result__detail {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .scan-result__order {
+      font-family: 'Courier New', monospace;
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+    }
+
+    /* Controls */
+    .scanner-controls {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar"></header>
+
+  <main class="page-content">
+    <div class="scanner-page">
+
+      <div class="scanner-header">
+        <a href="index.html" class="btn btn--ghost btn--sm" style="flex-shrink:0;margin-top:4px">← Panel</a>
+        <div>
+          <h1>Validador QR</h1>
+          <p style="font-size:var(--text-sm);color:var(--text-secondary)">
+            Apunta la cámara al código QR de la entrada para validarla
+          </p>
+        </div>
+      </div>
+
+      <!-- Live stats -->
+      <div class="scanner-stats">
+        <div class="scanner-stat">
+          <div class="scanner-stat__value" id="statTotal">—</div>
+          <div class="scanner-stat__label">Vendidas</div>
+        </div>
+        <div class="scanner-stat">
+          <div class="scanner-stat__value" id="statValidated">0</div>
+          <div class="scanner-stat__label">Validadas</div>
+        </div>
+        <div class="scanner-stat">
+          <div class="scanner-stat__value" id="statPending">—</div>
+          <div class="scanner-stat__label">Pendientes</div>
+        </div>
+      </div>
+
+      <!-- Camera viewport -->
+      <div class="scanner-viewport" id="scannerViewport">
+        <video id="scannerVideo" playsinline muted autoplay></video>
+        <canvas id="scannerCanvas" style="display:none"></canvas>
+        <div class="scanner-guide" aria-hidden="true"></div>
+        <div class="scanner-guide-br" aria-hidden="true"></div>
+        <div class="scanner-line" id="scanLine"></div>
+        <div class="camera-error" id="cameraError">
+          <span style="font-size:2.5rem">📷</span>
+          <p style="font-size:var(--text-sm)">No se pudo acceder a la cámara.<br>Comprueba los permisos del navegador.</p>
+          <button class="btn btn--secondary btn--sm" onclick="startCamera()">Reintentar</button>
+        </div>
+      </div>
+
+      <!-- Result display -->
+      <div class="scan-result scan-result--waiting" id="scanResult">
+        <div class="scan-result__icon">📷</div>
+        <div class="scan-result__status scan-result__status--waiting">Esperando escaneo...</div>
+        <div class="scan-result__detail">Coloca el QR dentro del recuadro</div>
+      </div>
+
+      <!-- Controls -->
+      <div class="scanner-controls">
+        <button class="btn btn--secondary" id="stopBtn" onclick="stopCamera()" style="display:none">
+          Detener cámara
+        </button>
+        <a href="tickets.html" class="btn btn--ghost">
+          Ver listado de entradas →
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="footer"></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+  <script src="../js/store.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/data.js"></script>
+  <script src="../js/ui.js"></script>
+  <script>
+    let videoStream  = null;
+    let scanInterval = null;
+    let lastCode     = null;
+    let lastCodeTime = 0;
+    const DEBOUNCE_MS = 3000;
+
+    (async () => {
+      UI.renderNavbar({ base: '..', activePage: 'admin' });
+      UI.renderFooter({ base: '..' });
+
+      if (!Auth.requireAdmin()) return;
+
+      await Data.loadAll();
+      updateStats();
+      startCamera();
+    })();
+
+    function updateStats() {
+      const purchases   = Store.purchases.get();
+      const validations = Store.validations.get();
+      const total       = purchases.length;
+      const validated   = Object.keys(validations).length;
+      document.getElementById('statTotal').textContent     = total;
+      document.getElementById('statValidated').textContent = validated;
+      document.getElementById('statPending').textContent   = Math.max(0, total - validated);
+    }
+
+    async function startCamera() {
+      const video   = document.getElementById('scannerVideo');
+      const errDiv  = document.getElementById('cameraError');
+      errDiv.classList.remove('show');
+
+      try {
+        videoStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: 'environment' },
+            width:  { ideal: 1280 },
+            height: { ideal: 720 },
+          }
+        });
+        video.srcObject = videoStream;
+        await video.play();
+        document.getElementById('stopBtn').style.display = '';
+        startScanning();
+      } catch (err) {
+        console.warn('Camera error:', err);
+        errDiv.classList.add('show');
+        document.getElementById('scanLine').style.display = 'none';
+      }
+    }
+
+    function stopCamera() {
+      if (videoStream) {
+        videoStream.getTracks().forEach(t => t.stop());
+        videoStream = null;
+      }
+      clearInterval(scanInterval);
+      scanInterval = null;
+      document.getElementById('stopBtn').style.display = 'none';
+      document.getElementById('scanLine').style.display = 'none';
+    }
+
+    function startScanning() {
+      const video  = document.getElementById('scannerVideo');
+      const canvas = document.getElementById('scannerCanvas');
+      const ctx    = canvas.getContext('2d');
+
+      scanInterval = setInterval(() => {
+        if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
+
+        canvas.width  = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: 'dontInvert',
+        });
+
+        if (code) {
+          const now = Date.now();
+          if (code.data === lastCode && (now - lastCodeTime) < DEBOUNCE_MS) return;
+          lastCode     = code.data;
+          lastCodeTime = now;
+          processQR(code.data);
+        }
+      }, 200);
+    }
+
+    function processQR(qrText) {
+      const purchases = Store.purchases.get();
+
+      // Buscar primero por qr_data exacto
+      let purchase = purchases.find(p => p.qr_data === qrText);
+
+      // Fallback: formato "ESCENA-ESC-xxx" → strip "ESCENA-" y buscar por id
+      if (!purchase && qrText.startsWith('ESCENA-')) {
+        const orderId = qrText.slice(7);
+        purchase = purchases.find(p => p.id === orderId);
+      }
+
+      if (!purchase) {
+        showResult('invalid', null, qrText);
+        return;
+      }
+
+      const alreadyUsed = Store.validations.isUsed(purchase.id);
+
+      if (alreadyUsed) {
+        const usedAt = Store.validations.get()[purchase.id]?.validated_at;
+        showResult('used', purchase, null, usedAt);
+      } else {
+        Store.validations.validate(purchase.id);
+        showResult('valid', purchase);
+        updateStats();
+      }
+    }
+
+    function showResult(state, purchase, rawText, usedAt) {
+      const el = document.getElementById('scanResult');
+      el.className = `scan-result scan-result--${state}`;
+
+      const configs = {
+        valid: {
+          icon: '✓',
+          status: 'VÁLIDA',
+          detail: purchase
+            ? `<strong>${purchase.buyer_name}</strong><br>
+               ${purchase.event_title || 'Evento'}<br>
+               ${(purchase.items || []).map(i => `${i.ticket_type_name} ×${i.quantity}`).join(', ')}`
+            : '',
+        },
+        used: {
+          icon: '⚠',
+          status: 'YA USADA',
+          detail: purchase
+            ? `<strong>${purchase.buyer_name}</strong><br>
+               Validada el ${usedAt ? new Date(usedAt).toLocaleString('es-ES') : '—'}`
+            : '',
+        },
+        invalid: {
+          icon: '✗',
+          status: 'INVÁLIDA',
+          detail: `Código no encontrado en el sistema${rawText ? `<br><small style="font-family:monospace;word-break:break-all">${rawText.slice(0, 40)}</small>` : ''}`,
+        },
+      };
+
+      const cfg = configs[state];
+      el.innerHTML = `
+        <div class="scan-result__icon">${cfg.icon}</div>
+        <div class="scan-result__status scan-result__status--${state}">${cfg.status}</div>
+        <div class="scan-result__detail">${cfg.detail}</div>
+        ${purchase ? `<div class="scan-result__order">${purchase.id}</div>` : ''}
+      `;
+
+      // Auto-reset tras 4s
+      clearTimeout(window._clearTimer);
+      window._clearTimer = setTimeout(() => {
+        el.className = 'scan-result scan-result--waiting';
+        el.innerHTML = `
+          <div class="scan-result__icon">📷</div>
+          <div class="scan-result__status scan-result__status--waiting">Esperando escaneo...</div>
+          <div class="scan-result__detail">Coloca el QR dentro del recuadro</div>
+        `;
+      }, 4000);
+    }
+  </script>
+</body>
+</html>

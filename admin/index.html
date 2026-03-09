@@ -14,9 +14,41 @@
       align-items: start;
     }
 
+    /* Mobile sidebar overlay */
+    .admin-sidebar-toggle { display: none; }
+
     @media (max-width: 900px) {
       .admin-layout { grid-template-columns: 1fr; }
-      .admin-sidebar { display: none; }
+      .admin-sidebar-toggle { display: inline-flex; }
+
+      .admin-sidebar {
+        display: block !important;
+        position: fixed;
+        top: var(--navbar-height);
+        left: 0;
+        bottom: 0;
+        width: 260px;
+        z-index: 150;
+        background: var(--bg-card);
+        border-right: 1px solid var(--border);
+        padding: var(--space-lg);
+        overflow-y: auto;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+
+      .admin-sidebar.open { transform: translateX(0); }
+
+      .admin-sidebar-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        top: var(--navbar-height);
+        background: rgba(0,0,0,0.6);
+        z-index: 149;
+      }
+
+      .admin-sidebar-backdrop.show { display: block; }
     }
 
     /* Sidebar */
@@ -108,6 +140,11 @@
 
     .table-scroll { overflow-x: auto; }
 
+    @media (max-width: 768px) {
+      .admin-table th,
+      .admin-table td { white-space: nowrap; }
+    }
+
     .admin-table td:first-child { font-weight: 600; color: var(--text-primary); }
 
     .event-thumb {
@@ -182,12 +219,14 @@
 <body>
   <header class="navbar"></header>
 
+  <div class="admin-sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
   <main class="page-content">
     <div class="container">
       <div class="admin-layout">
 
         <!-- ─── Sidebar ─────────────────────────────────── -->
-        <aside class="admin-sidebar">
+        <aside class="admin-sidebar" id="adminSidebar">
           <div class="admin-sidebar__section">
             <div class="admin-sidebar__label">Panel</div>
             <a class="admin-nav-item active" href="index.html">
@@ -197,6 +236,14 @@
             <a class="admin-nav-item" href="event-form.html">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Crear evento
+            </a>
+            <a class="admin-nav-item" href="tickets.html">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><line x1="12" y1="3" x2="12" y2="9"/><line x1="12" y1="15" x2="12" y2="21"/></svg>
+              Entradas vendidas
+            </a>
+            <a class="admin-nav-item" href="scanner.html">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="5"/><rect x="16" y="3" width="5" height="5"/><rect x="3" y="16" width="5" height="5"/><line x1="21" y1="12" x2="12" y2="12"/><line x1="12" y1="16" x2="12" y2="21"/></svg>
+              Validar entradas
             </a>
           </div>
           <div class="admin-sidebar__section">
@@ -215,9 +262,12 @@
         <!-- ─── Main content ──────────────────────────── -->
         <div>
           <div class="admin-header">
-            <div>
-              <h1>Dashboard</h1>
-              <p class="text-secondary" id="welcomeMsg" style="font-size:var(--text-sm)">Bienvenido al panel de gestión</p>
+            <div style="display:flex;align-items:center;gap:var(--space-md)">
+              <button class="btn btn--secondary btn--sm admin-sidebar-toggle" onclick="toggleSidebar()">☰ Menú</button>
+              <div>
+                <h1>Dashboard</h1>
+                <p class="text-secondary" id="welcomeMsg" style="font-size:var(--text-sm)">Bienvenido al panel de gestión</p>
+              </div>
             </div>
             <a href="event-form.html" class="btn btn--primary">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -226,21 +276,26 @@
           </div>
 
           <!-- Quick actions -->
-          <div class="quick-actions">
+          <div class="quick-actions" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr))">
             <a href="event-form.html" class="quick-action-card">
               <div class="quick-action-card__icon">🎵</div>
               <div class="quick-action-card__label">Nuevo evento</div>
               <div class="quick-action-card__sub">Crear y publicar</div>
             </a>
-            <a href="../index.html" class="quick-action-card">
-              <div class="quick-action-card__icon">👁</div>
-              <div class="quick-action-card__label">Ver web</div>
-              <div class="quick-action-card__sub">Vista pública</div>
+            <a href="tickets.html" class="quick-action-card">
+              <div class="quick-action-card__icon">🎟</div>
+              <div class="quick-action-card__label">Ver entradas</div>
+              <div class="quick-action-card__sub">Listado completo</div>
+            </a>
+            <a href="scanner.html" class="quick-action-card">
+              <div class="quick-action-card__icon">📷</div>
+              <div class="quick-action-card__label">Validar QR</div>
+              <div class="quick-action-card__sub">Escáner de acceso</div>
             </a>
             <button class="quick-action-card" onclick="exportCSV()">
               <div class="quick-action-card__icon">📊</div>
               <div class="quick-action-card__label">Exportar CSV</div>
-              <div class="quick-action-card__sub">Asistentes</div>
+              <div class="quick-action-card__sub">Datos de eventos</div>
             </button>
           </div>
 
@@ -319,6 +374,25 @@
   <script>
     let deleteTargetId = null;
 
+    function toggleSidebar() {
+      const sidebar  = document.getElementById('adminSidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      const isOpen   = sidebar.classList.contains('open');
+      sidebar.classList.toggle('open', !isOpen);
+      backdrop.classList.toggle('show', !isOpen);
+      document.body.style.overflow = isOpen ? '' : 'hidden';
+    }
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 900) {
+        const sidebar  = document.getElementById('adminSidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        if (sidebar) sidebar.classList.remove('open');
+        if (backdrop) backdrop.classList.remove('show');
+        document.body.style.overflow = '';
+      }
+    });
+
     (async () => {
       UI.renderNavbar({ base: '..', activePage: 'admin' });
       UI.renderFooter({ base: '..' });
@@ -389,6 +463,7 @@
             <td><span class="badge badge--status-${ev.status}">${labelStatus(ev.status)}</span></td>
             <td>
               <div class="admin-table__actions">
+                <a href="tickets.html?event=${ev.id}" class="btn btn--secondary btn--sm">Entradas</a>
                 <a href="../event.html?id=${ev.id}" class="btn btn--ghost btn--sm" target="_blank">Ver</a>
               </div>
             </td>
@@ -420,10 +495,11 @@
             <td><span class="badge badge--status-${ev.status}">${labelStatus(ev.status)}</span></td>
             <td>
               <div class="admin-table__actions">
+                <a href="tickets.html?event=${ev.id}" class="btn btn--secondary btn--sm">Entradas</a>
                 <button class="btn btn--ghost btn--sm" onclick="toggleStatus('${ev.id}')">
                   ${ev.status === 'published' ? 'Despublicar' : 'Publicar'}
                 </button>
-                <a href="event-form.html?edit=${ev.id}" class="btn btn--secondary btn--sm">Editar</a>
+                <a href="event-form.html?edit=${ev.id}" class="btn btn--ghost btn--sm">Editar</a>
                 <button class="btn btn--danger btn--sm" onclick="confirmDelete('${ev.id}')">Eliminar</button>
               </div>
             </td>
