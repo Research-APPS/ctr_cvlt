@@ -23,6 +23,11 @@ const UI = (() => {
           ${isAdmin ? `<a href="${base}/admin/index.html" class="${activePage === 'admin' ? 'active' : ''}">Panel</a>` : ''}
         </nav>
         <div class="navbar__actions">
+          ${isAdmin ? `
+            <a href="${base}/admin/linktree.html" class="navbar__linktree-btn" title="Gestionar Mi Linktree">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+              <span class="hide-mobile">Mi Linktree</span>
+            </a>` : ''}
           <button class="navbar__cart" onclick="window.location.href='${base}/profile.html'" title="Mi perfil / entradas">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/>
@@ -44,6 +49,7 @@ const UI = (() => {
       <div class="navbar__mobile-menu" id="mobileMenu">
         <a href="${base}/index.html">Conciertos</a>
         ${isAdmin ? `<a href="${base}/admin/index.html">Panel admin</a>` : ''}
+        ${isAdmin ? `<a href="${base}/admin/linktree.html">🔗 Mi Linktree</a>` : ''}
         ${user
           ? `<a href="${base}/profile.html">Mi perfil (${user.name.split(' ')[0]})</a>
              <a href="#" onclick="Auth.logout()">Cerrar sesión</a>`

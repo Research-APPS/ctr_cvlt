@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Links — ESCENA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0a0a0a;
+      --card:    #141414;
+      --border:  #1e1e1e;
+      --accent:  #c8ff00;
+      --text:    #f5f5f5;
+      --muted:   #888;
+      --radius:  16px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 20px 80px;
+    }
+
+    /* Background glow */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(200,255,0,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .lt-wrap {
+      width: 100%;
+      max-width: 480px;
+    }
+
+    /* Profile header */
+    .lt-profile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .lt-avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .lt-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .lt-bio {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.5;
+      max-width: 320px;
+    }
+
+    /* Links list */
+    .lt-links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .lt-link {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.9375rem;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      cursor: pointer;
+      width: 100%;
+      position: relative;
+    }
+
+    .lt-link:hover {
+      border-color: var(--accent);
+      background: rgba(200,255,0,0.04);
+      transform: translateY(-2px);
+    }
+
+    .lt-link:active { transform: translateY(0); }
+
+    .lt-link__icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      width: 36px;
+      text-align: center;
+    }
+
+    .lt-link__title {
+      flex: 1;
+    }
+
+    .lt-link__arrow {
+      color: var(--muted);
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    /* Empty state */
+    .lt-empty {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--muted);
+      font-size: 0.875rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    /* Footer */
+    .lt-footer {
+      margin-top: 48px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .lt-footer a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    /* Loading skeleton */
+    .lt-skeleton {
+      height: 64px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      animation: shimmer 1.5s ease infinite;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { opacity: 0.5; }
+      50%       { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="lt-wrap">
+
+    <!-- Profile -->
+    <div class="lt-profile">
+      <div class="lt-avatar" id="ltAvatar">E</div>
+      <div class="lt-name" id="ltName">ESCENA</div>
+      <div class="lt-bio" id="ltBio">Plataforma de ticketing independiente · Conciertos y cultura</div>
+    </div>
+
+    <!-- Links -->
+    <div class="lt-links" id="ltLinks">
+      <!-- Skeletons while loading -->
+      <div class="lt-skeleton"></div>
+      <div class="lt-skeleton"></div>
+      <div class="lt-skeleton"></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="lt-footer">
+      <p>Hecho con <a href="index.html">ESCENA</a></p>
+    </div>
+
+  </div>
+
+  <script src="js/store.js"></script>
+  <script>
+    (function () {
+      const links = Store.linktree.get().filter(l => l.active);
+      const container = document.getElementById('ltLinks');
+
+      if (!links.length) {
+        container.innerHTML = `<div class="lt-empty">No hay enlaces publicados aún.</div>`;
+        return;
+      }
+
+      container.innerHTML = links.map(l => {
+        const isExternal = l.url.startsWith('http');
+        return `
+          <a class="lt-link"
+             href="${l.url}"
+             ${isExternal ? 'target="_blank" rel="noopener"' : ''}>
+            <span class="lt-link__icon">${l.icon || '🔗'}</span>
+            <span class="lt-link__title">${l.title}</span>
+            <span class="lt-link__arrow">→</span>
+          </a>`;
+      }).join('');
+    })();
+  </script>
+</body>
+</html>

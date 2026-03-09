@@ -12,6 +12,7 @@ const Store = (() => {
     ADMIN_EVENTS:  'escena_admin_events',
     DEMO_BANNER:   'escena_demo_banner',
     VALIDATIONS:   'escena_validations',
+    LINKTREE:      'escena_linktree',
   };
 
   // ─── Generic helpers ──────────────────────────────────────
@@ -127,7 +128,51 @@ const Store = (() => {
     clear: () => set(KEYS.VALIDATIONS, {}),
   };
 
-  return { user, cart, purchases, favorites, adminEvents, validations };
+  // ─── Linktree ─────────────────────────────────────────────
+  const DEFAULT_LINKS = [
+    { id: 'lt-1', icon: '🎵', title: 'Próximos conciertos', url: 'index.html', active: true, order: 0 },
+    { id: 'lt-2', icon: '📸', title: 'Instagram', url: 'https://instagram.com', active: true, order: 1 },
+    { id: 'lt-3', icon: '🎧', title: 'Spotify', url: 'https://spotify.com', active: true, order: 2 },
+    { id: 'lt-4', icon: '📹', title: 'YouTube', url: 'https://youtube.com', active: true, order: 3 },
+  ];
+
+  const linktree = {
+    get: () => {
+      const saved = get(KEYS.LINKTREE, null);
+      return saved !== null ? saved : DEFAULT_LINKS;
+    },
+    set: (links) => set(KEYS.LINKTREE, links),
+    add: (link) => {
+      const links = linktree.get();
+      links.push({ ...link, order: links.length });
+      set(KEYS.LINKTREE, links);
+    },
+    remove: (id) => {
+      const filtered = linktree.get().filter(l => l.id !== id);
+      set(KEYS.LINKTREE, filtered);
+    },
+    update: (id, data) => {
+      const links = linktree.get();
+      const idx = links.findIndex(l => l.id === id);
+      if (idx >= 0) { links[idx] = { ...links[idx], ...data }; set(KEYS.LINKTREE, links); }
+    },
+    toggle: (id) => {
+      const links = linktree.get();
+      const l = links.find(l => l.id === id);
+      if (l) { l.active = !l.active; set(KEYS.LINKTREE, links); }
+    },
+    move: (id, dir) => {
+      const links = linktree.get();
+      const idx = links.findIndex(l => l.id === id);
+      const swap = dir === 'up' ? idx - 1 : idx + 1;
+      if (swap < 0 || swap >= links.length) return;
+      [links[idx], links[swap]] = [links[swap], links[idx]];
+      links.forEach((l, i) => l.order = i);
+      set(KEYS.LINKTREE, links);
+    },
+  };
+
+  return { user, cart, purchases, favorites, adminEvents, validations, linktree };
 })();
 
 // Make globally available
